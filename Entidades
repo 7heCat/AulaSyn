@@ -1,0 +1,34 @@
+# Entidades principales de la base de datos - AulaSyn
+
+## Docentes
+- **Código** (identificador único)
+- **Nombre**
+- **Disponibilidad horaria**
+- **Asignaturas** (relación con asignaturas)
+- **Sedes**
+
+## Salones
+- **Código** (identificador único)
+- **Capacidad**
+- **Tipo** (ej: aula, laboratorio, auditorio)
+- **Ubicación**
+- **Equipamiento**
+
+## Grupos
+- **Código** (identificador único)
+- **Programa** (ej: Ingeniería de Sistemas)
+- **Semestre**
+- **Número de estudiantes**
+
+## Asignaturas
+- **Código** (identificador único)
+- **Nombre**
+- **Intensidad horaria semanal**
+- **Prerrequisitos** (relación con otras asignaturas)
+
+## Horarios
+- **Franja horaria** (ej: 8:00 - 10:00)
+- **Día**
+- **Docente asignado** (relación con Docentes)
+- **Salón asignado** (relación con Salones)
+- **Grupo asignado** (relación con Grupos)
