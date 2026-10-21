@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AulaSyn | Autenticacion</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/autenticacion.css') }}">
+    <script src="{{ url_for('static', filename='js/autenticacion.js') }}" defer></script>
+</head>
+<body>
+    <main class="pagina-autenticacion">
+
+        <section class="panel-institucional">
+            <div class="logo-institucional">
+                <img 
+                    src="{{ url_for('static', filename='img/Logo UNIAJC.png') }}"
+                    alt="Logo UNIAJC"
+                >
+            </div>
+
+            <div class="mensaje-institucional">
+                <p>
+                    Herramienta basada en técnicas computacionales
+                    de inteligencia artificial para la asignación
+                    de horarios, salones y docentes del programa
+                    de Ingeniería en Sistemas.
+                </p>
+            </div>
+        </section>
+
+        <section class="panel-principal">
+                <header class="marca-aulasyn">
+                        <div class="logo-libro">
+                            <img 
+                                src="{{ url_for('static', filename='img/Logo AulaSyn.png') }}"
+                                alt="Logo AulaSyn"
+                            >
+                            <h1>AulaSyn</h1>
+                        </div>
+                </header>
+
+                <div class="tarjeta-autenticacion">
+                    <div class="encabezado-tarjeta">
+                        <div class="marca-tarjeta">
+                            <div class="logo-libro pequeño">
+                                <img 
+                                src="{{ url_for('static', filename='img/Logo AulaSyn.png') }}"
+                                alt="Logo AulaSyn"
+                                >
+                                <h2>AulaSyn</h2>
+                            </div>
+                        </div>
+                        <span class="etiqueta-año">2026</span>
+                    </div>
+
+                    <div id="contenido-formulario">
+                        <h2>Bienvenido</h2>
+                        <p>Inicia sesión para entrar a tu espacio de trabajo.</p>
+
+                        <div class="campo">
+                            <label for="correo-login">Correo institucional</label>
+                            <input
+                                type="email"
+                                id="correo-login"
+                                placeholder="usuario@estudiante.edu.co"
+                            >
+                        </div>
+
+                        <div class="campo">
+                            <label for="contrasena-login">Contraseña</label>
+                            <input
+                                type="password"
+                                id="contrasena-login"
+                                placeholder="Ingresa tu contraseña"
+                            >
+                        </div>
+
+                        <div class="opciones-login">
+                            <label>
+                                <input type="checkbox" id="recordar">
+                                Recordar contraseña
+                            </label>
+                            <button type="button" class="enlace" id="ir-recuperacion">
+                                ¿Olvidaste la contraseña?
+                            </button>
+                        </div>
+
+                        <button type="button" class="boton-principal" id="ingresar">
+                            Ingresar <span>→</span>
+                        </button>
+
+                         <div class="separador"><span>o</span></div>
+
+                        <button type="button" class="boton-secundario" id="ir-registro">
+                            Crear cuenta
+                        </button>
+                         
+                    </div>
+                </div>
+        </section>
+
+    </main>
+</body>
+</html>       
