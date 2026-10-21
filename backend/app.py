@@ -1,5 +1,5 @@
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, render_template
 from config.database import obtener_conexion
 
 app = Flask(
@@ -10,7 +10,7 @@ app = Flask(
 
 @app.route("/")
 def inicio():
-    return "AulaSyn: backend funcionando correctamente"
+    return render_template("autenticacion.html")
 
 @app.route("/api/estado-db")
 def estado_db():
