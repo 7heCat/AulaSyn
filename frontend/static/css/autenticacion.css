@@ -37,6 +37,13 @@ button {
     cursor: pointer;
 }
 
+
+/* Oculta las vistas que no están seleccionadas */
+.vista-autenticacion[hidden] {
+    display: none !important;
+}
+
+
 /* DISTRIBUCIÓN PRINCIPAL */
 .pagina-autenticacion {
     display: grid;
@@ -355,6 +362,105 @@ button {
     background: transparent;
     border: 1px solid #b8d0f7;
 }
+
+
+
+/* SELECTOR DE ROL */
+.selector-rol {
+    display: flex;
+    width: 100%;
+    gap: 4px;
+    padding: 4px;
+    background: #dfe7f2;
+    border-radius: 12px;
+}
+
+.opcion-rol {
+    flex: 1;
+    min-width: 0;
+    padding: 10px 5px;
+    color: #5f6f86;
+    background: transparent;
+    border: none;
+    border-radius: 9px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.opcion-rol.seleccionada {
+    color: #fff;
+    background: linear-gradient(110deg, #397fea, #28518f);
+    box-shadow: 0 3px 8px rgb(37 94 172 / 22%);
+}
+
+/* CAMPOS EN DOS COLUMNAS */
+.fila-campos {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.aceptar-terminos {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    margin: 4px 0 18px;
+    color: #64748b;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.aceptar-terminos input {
+    margin-top: 3px;
+    accent-color: var(--azul-principal);
+}
+
+/* AJUSTES DE LOS FORMULARIOS DINÁMICOS */
+#contenido-formulario .descripcion {
+    margin-bottom: 18px;
+    color: var(--texto-secundario);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+#contenido-formulario .campo {
+    gap: 7px;
+    margin-bottom: 14px;
+}
+
+#contenido-formulario .campo label {
+    font-size: 10px;
+}
+
+#contenido-formulario .campo input {
+    width: 100%;
+    min-height: 42px;
+    padding: 10px 12px;
+    font-size: 13px;
+}
+
+#contenido-formulario .separador {
+    margin: 15px 0;
+}
+
+#contenido-formulario .boton-principal,
+#contenido-formulario .boton-secundario {
+    min-height: 42px;
+    font-size: 12px;
+}
+
+/* ADAPTACIÓN A PANTALLAS PEQUEÑAS */
+@media (max-width: 520px) {
+    .fila-campos {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .opcion-rol {
+        font-size: 11px;
+    }
+}
+
 
 /* ADAPTACIÓN A CELULARES */
 @media (max-width: 800px) {

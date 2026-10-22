@@ -1,61 +1,73 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AulaSyn | Autenticacion</title>
+    <title>AulaSyn | Autenticación</title>
+
     <link rel="stylesheet" href="{{ url_for('static', filename='css/autenticacion.css') }}">
     <script src="{{ url_for('static', filename='js/autenticacion.js') }}" defer></script>
 </head>
 <body>
     <main class="pagina-autenticacion">
 
+        <!-- Panel institucional compartido por las tres vistas -->
         <section class="panel-institucional">
             <div class="logo-institucional">
-                <img 
+                <img
                     src="{{ url_for('static', filename='img/Logo UNIAJC.png') }}"
                     alt="Logo UNIAJC"
                 >
             </div>
 
             <div class="mensaje-institucional">
-                <p>
-                    Herramienta basada en técnicas computacionales
-                    de inteligencia artificial para la asignación
-                    de horarios, salones y docentes del programa
-                    de Ingeniería en Sistemas.
+                <p id="mensaje-panel">
+                    Herramienta basada en técnicas computacionales de
+                    inteligencia artificial para la asignación de horarios,
+                    salones y docentes del programa de Ingeniería en Sistemas.
                 </p>
             </div>
         </section>
 
+        <!-- Panel derecho donde se muestran los formularios -->
         <section class="panel-principal">
-                <header class="marca-aulasyn">
-                        <div class="logo-libro">
-                            <img 
+
+            <header class="marca-aulasyn">
+                <div class="logo-libro">
+                    <img
+                        src="{{ url_for('static', filename='img/Logo AulaSyn.png') }}"
+                        alt="Logo AulaSyn"
+                    >
+                    <h1>AulaSyn</h1>
+                </div>
+            </header>
+
+            <div class="tarjeta-autenticacion">
+
+                <!-- Encabezado compartido de la tarjeta -->
+                <div class="encabezado-tarjeta">
+                    <div class="marca-tarjeta">
+                        <div class="logo-libro pequeño">
+                            <img
                                 src="{{ url_for('static', filename='img/Logo AulaSyn.png') }}"
                                 alt="Logo AulaSyn"
                             >
-                            <h1>AulaSyn</h1>
+                            <h2>AulaSyn</h2>
                         </div>
-                </header>
-
-                <div class="tarjeta-autenticacion">
-                    <div class="encabezado-tarjeta">
-                        <div class="marca-tarjeta">
-                            <div class="logo-libro pequeño">
-                                <img 
-                                src="{{ url_for('static', filename='img/Logo AulaSyn.png') }}"
-                                alt="Logo AulaSyn"
-                                >
-                                <h2>AulaSyn</h2>
-                            </div>
-                        </div>
-                        <span class="etiqueta-año">2026</span>
                     </div>
 
-                    <div id="contenido-formulario">
+                    <span class="etiqueta-año">2026</span>
+                </div>
+
+                <div id="contenido-formulario">
+
+                    <!-- VISTA 1: INICIO DE SESIÓN -->
+                    <section id="vista-login" class="vista-autenticacion">
                         <h2>Bienvenido</h2>
-                        <p>Inicia sesión para entrar a tu espacio de trabajo.</p>
+                        <p class="descripcion">
+                            Inicia sesión para entrar a tu espacio de trabajo.
+                        </p>
 
                         <div class="campo">
                             <label for="correo-login">Correo institucional</label>
@@ -63,6 +75,8 @@
                                 type="email"
                                 id="correo-login"
                                 placeholder="usuario@estudiante.edu.co"
+                                autocomplete="username"
+                                required
                             >
                         </div>
 
@@ -72,6 +86,8 @@
                                 type="password"
                                 id="contrasena-login"
                                 placeholder="Ingresa tu contraseña"
+                                autocomplete="current-password"
+                                required
                             >
                         </div>
 
@@ -80,25 +96,259 @@
                                 <input type="checkbox" id="recordar">
                                 Recordar contraseña
                             </label>
-                            <button type="button" class="enlace" id="ir-recuperacion">
+
+                            <button
+                                type="button"
+                                class="enlace"
+                                id="ir-recuperacion"
+                            >
                                 ¿Olvidaste la contraseña?
                             </button>
                         </div>
 
-                        <button type="button" class="boton-principal" id="ingresar">
+                        <button
+                            type="button"
+                            class="boton-principal"
+                            id="ingresar"
+                        >
                             Ingresar <span>→</span>
                         </button>
 
-                         <div class="separador"><span>o</span></div>
+                        <div class="separador"><span>o</span></div>
 
-                        <button type="button" class="boton-secundario" id="ir-registro">
+                        <button
+                            type="button"
+                            class="boton-secundario"
+                            id="ir-registro"
+                        >
                             Crear cuenta
                         </button>
-                         
-                    </div>
-                </div>
-        </section>
+                    </section>
 
+                    <!-- VISTA 2: REGISTRO -->
+                    <section
+                        id="vista-registro"
+                        class="vista-autenticacion"
+                        hidden
+                    >
+                        <h2>Crear cuenta</h2>
+                        <p class="descripcion">
+                            Completa tus datos para registrarte en AulaSyn.
+                        </p>
+
+                        <div class="campo">
+                            <label>Rol de usuario</label>
+
+                            <div class="selector-rol">
+                            <button
+                                type="button"
+                                class="opcion-rol"
+                                data-rol="profesor"
+                                aria-pressed="false"
+                            >
+                                Profesor
+                            </button>
+
+                            <button
+                                type="button"
+                                class="opcion-rol seleccionada"
+                                data-rol="estudiante"
+                                aria-pressed="true"
+                            >
+                                Estudiante
+                            </button>
+                        </div>
+
+                        <input type="hidden" id="rol-registro" value="estudiante">
+                        </div>
+
+                        <div class="fila-campos">
+                            <div class="campo">
+                                <label for="nombres">Nombres</label>
+                                <input
+                                    type="text"
+                                    id="nombres"
+                                    placeholder="Ingresa tus nombres"
+                                    autocomplete="given-name"
+                                    required
+                                >
+                            </div>
+
+                            <div class="campo">
+                                <label for="apellidos">Apellidos</label>
+                                <input
+                                    type="text"
+                                    id="apellidos"
+                                    placeholder="Ingresa tus apellidos"
+                                    autocomplete="family-name"
+                                    required
+                                >
+                            </div>
+                        </div>
+
+                        <div class="fila-campos">
+                            <div class="campo">
+                                <label for="correo-registro">Correo institucional</label>
+                                <input
+                                    type="email"
+                                    id="correo-registro"
+                                    placeholder="Ingresa tu correo"
+                                    autocomplete="email"
+                                    required
+                                >
+                            </div>
+
+                            <div class="campo">
+                                <label for="documento">Documento</label>
+                                <input
+                                    type="text"
+                                    id="documento"
+                                    placeholder="Ingresa tu documento"
+                                    autocomplete="off"
+                                    required
+                                >
+                            </div>
+                        </div>
+
+                        <div class="fila-campos">
+                            <div class="campo">
+                                <label for="contrasena-registro">Contraseña</label>
+                                <input
+                                    type="password"
+                                    id="contrasena-registro"
+                                    placeholder="Crea una contraseña"
+                                    autocomplete="new-password"
+                                    required
+                                >
+                            </div>
+
+                            <div class="campo">
+                                <label for="confirmar-contrasena">Confirmar contraseña</label>
+                                <input
+                                    type="password"
+                                    id="confirmar-contrasena"
+                                    placeholder="Repite tu contraseña"
+                                    autocomplete="new-password"
+                                    required
+                                >
+                            </div>
+                        </div>
+
+                        <label class="aceptar-terminos">
+                            <input type="checkbox" id="acepta-terminos">
+
+                            <span>
+                                Acepto los términos de servicio y las políticas
+                                de privacidad.
+                            </span>
+                        </label>
+
+                        <button
+                            type="button"
+                            class="boton-principal"
+                            id="registrar"
+                        >
+                            Crear cuenta <span>→</span>
+                        </button>
+
+                        <div class="separador"><span>o</span></div>
+
+                        <button
+                            type="button"
+                            class="boton-secundario"
+                            id="volver-login-registro"
+                        >
+                            Volver al inicio de sesión
+                        </button>
+                    </section>
+
+                    <!-- VISTA 3: RECUPERACIÓN DE CONTRASEÑA -->
+                    <section
+                        id="vista-recuperacion"
+                        class="vista-autenticacion"
+                        hidden
+                    >
+                        <h2>Bienvenido, recupera tu cuenta</h2>
+                        <p class="descripcion">
+                            Restablece la contraseña para entrar a tu espacio de trabajo.
+                        </p>
+
+                        <div class="campo">
+                            <label for="correo-recuperacion">Correo institucional</label>
+                            <input
+                                type="email"
+                                id="correo-recuperacion"
+                                placeholder="Ingresa tu correo"
+                                autocomplete="email"
+                                required
+                            >
+                        </div>
+
+                        <button
+                            type="button"
+                            class="boton-principal"
+                            id="enviar-codigo"
+                        >
+                            Enviar código
+                        </button>
+
+                        <div class="campo">
+                            <label for="codigo-recuperacion">Código de verificación</label>
+                            <input
+                                type="text"
+                                id="codigo-recuperacion"
+                                placeholder="Ingresa el código recibido"
+                                autocomplete="one-time-code"
+                                required
+                            >
+                        </div>
+
+                        <div class="campo">
+                            <label for="nueva-contrasena">Nueva contraseña</label>
+                            <input
+                                type="password"
+                                id="nueva-contrasena"
+                                placeholder="Crea una nueva contraseña"
+                                autocomplete="new-password"
+                                required
+                            >
+                        </div>
+
+                        <div class="campo">
+                            <label for="confirmar-nueva-contrasena">
+                                Confirmar contraseña
+                            </label>
+                            <input
+                                type="password"
+                                id="confirmar-nueva-contrasena"
+                                placeholder="Repite la nueva contraseña"
+                                autocomplete="new-password"
+                                required
+                            >
+                        </div>
+
+                        <button
+                            type="button"
+                            class="boton-principal"
+                            id="guardar-contrasena"
+                        >
+                            Restablecer contraseña
+                        </button>
+
+                        <div class="separador"><span>o</span></div>
+
+                        <button
+                            type="button"
+                            class="boton-secundario"
+                            id="volver-login-recuperacion"
+                        >
+                            Volver al inicio de sesión
+                        </button>
+                    </section>
+
+                </div>
+            </div>
+        </section>
     </main>
 </body>
-</html>       
+</html>
