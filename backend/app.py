@@ -1,6 +1,8 @@
+
 from flask import Flask, jsonify, render_template, request
 from config.database import obtener_conexion
 from werkzeug.security import generate_password_hash
+from permisos import requiere_permiso
 import re
 
 app = Flask(
@@ -36,7 +38,7 @@ def estado_db():
         return jsonify({
             "estado": "conectado",
             "base_datos": nombre_bd
-        })
+        }), 200
 
     except Exception:
         app.logger.exception("Error al consultar PostgreSQL")
@@ -95,13 +97,13 @@ def registrar_usuario():
             "mensaje": "Debes aceptar los términos y las políticas de privacidad."
         }), 400
 
-    # El servidor no permite registrar coordinadores públicamente.
+    # No permitir el registro público de coordinadores.
     if rol not in DOMINIOS_POR_ROL:
         return jsonify({
             "mensaje": "Ese rol no está habilitado para el registro público."
         }), 400
 
-    # Verificar que el correo corresponda al rol elegido.
+    # Verificar el dominio institucional correspondiente al rol.
     if not correo.endswith(DOMINIOS_POR_ROL[rol]):
         return jsonify({
             "mensaje": "El correo no corresponde al dominio institucional del rol seleccionado."
@@ -110,7 +112,7 @@ def registrar_usuario():
     # Los estudiantes quedan activos y los profesores pendientes.
     estado_cuenta = "activo" if rol == "estudiante" else "pendiente"
 
-    # Nunca guardar la contraseña directamente.
+    # Guardar la contraseña mediante un hash seguro.
     contrasena_hash = generate_password_hash(contrasena)
 
     conexion = None
@@ -168,7 +170,6 @@ def registrar_usuario():
             "id_usuario": id_usuario
         }), 201
 
-    
     except Exception as error:
         app.logger.exception("Error al registrar usuario")
 
@@ -186,6 +187,15 @@ def registrar_usuario():
         if conexion is not None:
             conexion.close()
 
+
+# Ruta temporal para comprobar los permisos de HU2.
+@app.route("/api/prueba-permiso-docentes", methods=["GET"])
+@requiere_permiso("gestionar_docentes")
+def prueba_permiso_docentes():
+    return jsonify({
+        "mensaje": "Permiso verificado correctamente.",
+        "permiso": "gestionar_docentes"
+    }), 200
 
 
 if __name__ == "__main__":
