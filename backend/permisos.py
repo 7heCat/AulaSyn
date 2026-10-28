@@ -1,7 +1,7 @@
 
 from functools import wraps
 
-from flask import jsonify, request, g
+from flask import jsonify, session, g
 from config.database import obtener_conexion
 
 
@@ -9,11 +9,11 @@ def requiere_permiso(codigo_permiso):
     def decorador(funcion):
         @wraps(funcion)
         def envoltura(*args, **kwargs):
-            id_usuario = request.headers.get("X-Usuario-ID")
+            id_usuario = session.get("id_usuario")
 
-            if not id_usuario or not id_usuario.isdigit():
+            if not id_usuario:
                 return jsonify({
-                    "mensaje": "Debes identificarte para realizar esta operación."
+                    "mensaje": "Debes iniciar sesión para realizar esta operación."
                 }), 401
 
             conexion = None
@@ -39,7 +39,7 @@ def requiere_permiso(codigo_permiso):
                               AND p.codigo = %s
                         );
                         """,
-                        (int(id_usuario), codigo_permiso)
+                        (id_usuario, codigo_permiso)
                     )
 
                     autorizado = cursor.fetchone()[0]
@@ -49,7 +49,7 @@ def requiere_permiso(codigo_permiso):
                         "mensaje": "No tienes permiso para realizar esta operación."
                     }), 403
 
-                g.id_usuario = int(id_usuario)
+                g.id_usuario = id_usuario
                 return funcion(*args, **kwargs)
 
             except Exception:

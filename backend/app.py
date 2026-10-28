@@ -1,15 +1,41 @@
 
-from flask import Flask, jsonify, render_template, request
-from config.database import obtener_conexion
-from werkzeug.security import generate_password_hash
-from permisos import requiere_permiso
+import os
 import re
+
+from flask import (
+    Flask,
+    jsonify,
+    render_template,
+    request,
+    session
+)
+
+from config.database import obtener_conexion
+
+from werkzeug.security import (
+    generate_password_hash,
+    check_password_hash
+)
+
+from permisos import requiere_permiso
+
 
 app = Flask(
     __name__,
     template_folder="../frontend/templates",
     static_folder="../frontend/static"
 )
+
+
+# Configuración de seguridad de las sesiones.
+app.config["SECRET_KEY"] = os.getenv("FLASK_SECRET_KEY")
+app.config["SESSION_COOKIE_HTTPONLY"] = True
+app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+
+# En desarrollo local con HTTP.
+# Al desplegar AulaSyn con HTTPS, cambiar a True.
+app.config["SESSION_COOKIE_SECURE"] = False
+
 
 # Dominios permitidos para el registro público.
 DOMINIOS_POR_ROL = {
@@ -23,17 +49,134 @@ def inicio():
     return render_template("autenticacion.html")
 
 
-@app.route("/api/estado-db")
-def estado_db():
+# INICIO DE SESIÓN
+@app.route("/api/login", methods=["POST"])
+def iniciar_sesion():
+    datos = request.get_json(silent=True)
+
+    if not isinstance(datos, dict):
+        return jsonify({
+            "mensaje": "Datos de inicio de sesión no válidos."
+        }), 400
+
+    correo = str(datos.get("correo", "")).strip().lower()
+    contrasena = str(datos.get("contrasena", ""))
+
+    if not correo or not contrasena:
+        return jsonify({
+            "mensaje": "Ingresa tu correo y contraseña."
+        }), 400
+
+    conexion = None
+
     try:
         conexion = obtener_conexion()
 
-        try:
-            with conexion.cursor() as cursor:
-                cursor.execute("SELECT current_database();")
-                nombre_bd = cursor.fetchone()[0]
-        finally:
+        with conexion.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT
+                    id_usuario,
+                    nombres,
+                    apellidos,
+                    contrasena_hash,
+                    rol,
+                    activo,
+                    estado_cuenta
+                FROM public.usuarios
+                WHERE LOWER(correo) = %s
+                LIMIT 1;
+                """,
+                (correo,)
+            )
+
+            usuario = cursor.fetchone()
+
+        if not usuario:
+            return jsonify({
+                "mensaje": "Correo o contraseña incorrectos."
+            }), 401
+
+        (
+            id_usuario,
+            nombres,
+            apellidos,
+            contrasena_hash,
+            rol,
+            activo,
+            estado_cuenta
+        ) = usuario
+
+        if not check_password_hash(
+            contrasena_hash,
+            contrasena
+        ):
+            return jsonify({
+                "mensaje": "Correo o contraseña incorrectos."
+            }), 401
+
+        if not activo or estado_cuenta != "activo":
+            return jsonify({
+                "mensaje": (
+                    "Tu cuenta no está activa. "
+                    "Si eres profesor, espera la aprobación "
+                    "del administrador."
+                )
+            }), 403
+
+        # Crear una nueva sesión después de validar la cuenta.
+        session.clear()
+        session["id_usuario"] = id_usuario
+        session["rol"] = rol
+
+        return jsonify({
+            "mensaje": "Inicio de sesión correcto.",
+            "usuario": {
+                "id_usuario": id_usuario,
+                "nombres": nombres,
+                "apellidos": apellidos,
+                "rol": rol
+            }
+        }), 200
+
+    except Exception:
+        app.logger.exception(
+            "Error durante el inicio de sesión"
+        )
+
+        return jsonify({
+            "mensaje": (
+                "No fue posible iniciar sesión. "
+                "Inténtalo más tarde."
+            )
+        }), 500
+
+    finally:
+        if conexion is not None:
             conexion.close()
+
+
+# CIERRE DE SESIÓN
+@app.route("/api/logout", methods=["POST"])
+def cerrar_sesion():
+    session.clear()
+
+    return jsonify({
+        "mensaje": "Sesión cerrada correctamente."
+    }), 200
+
+
+# COMPROBAR CONEXIÓN CON LA BASE DE DATOS
+@app.route("/api/estado-db")
+def estado_db():
+    conexion = None
+
+    try:
+        conexion = obtener_conexion()
+
+        with conexion.cursor() as cursor:
+            cursor.execute("SELECT current_database();")
+            nombre_bd = cursor.fetchone()[0]
 
         return jsonify({
             "estado": "conectado",
@@ -41,14 +184,21 @@ def estado_db():
         }), 200
 
     except Exception:
-        app.logger.exception("Error al consultar PostgreSQL")
+        app.logger.exception(
+            "Error al consultar PostgreSQL"
+        )
 
         return jsonify({
             "estado": "error",
             "mensaje": "No se pudo conectar con la base de datos"
         }), 500
 
+    finally:
+        if conexion is not None:
+            conexion.close()
 
+
+# REGISTRO DE USUARIOS
 @app.route("/api/registro", methods=["POST"])
 def registrar_usuario():
     datos = request.get_json(silent=True)
@@ -67,7 +217,13 @@ def registrar_usuario():
     acepta_terminos = datos.get("acepta_terminos") is True
 
     # Validar campos obligatorios.
-    if not all([nombres, apellidos, correo, documento, contrasena]):
+    if not all([
+        nombres,
+        apellidos,
+        correo,
+        documento,
+        contrasena
+    ]):
         return jsonify({
             "mensaje": "Completa todos los campos obligatorios."
         }), 400
@@ -79,9 +235,13 @@ def registrar_usuario():
 
     if len(correo) > 150 or len(documento) > 30:
         return jsonify({
-            "mensaje": "El correo o documento supera la longitud permitida."
+            "mensaje": (
+                "El correo o documento supera "
+                "la longitud permitida."
+            )
         }), 400
 
+    # Validar el formato del correo.
     if not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", correo):
         return jsonify({
             "mensaje": "Ingresa un correo con formato válido."
@@ -89,28 +249,41 @@ def registrar_usuario():
 
     if len(contrasena) < 8:
         return jsonify({
-            "mensaje": "La contraseña debe tener al menos 8 caracteres."
+            "mensaje": (
+                "La contraseña debe tener al menos 8 caracteres."
+            )
         }), 400
 
     if not acepta_terminos:
         return jsonify({
-            "mensaje": "Debes aceptar los términos y las políticas de privacidad."
+            "mensaje": (
+                "Debes aceptar los términos y "
+                "las políticas de privacidad."
+            )
         }), 400
 
     # No permitir el registro público de coordinadores.
     if rol not in DOMINIOS_POR_ROL:
         return jsonify({
-            "mensaje": "Ese rol no está habilitado para el registro público."
+            "mensaje": (
+                "Ese rol no está habilitado "
+                "para el registro público."
+            )
         }), 400
 
     # Verificar el dominio institucional correspondiente al rol.
     if not correo.endswith(DOMINIOS_POR_ROL[rol]):
         return jsonify({
-            "mensaje": "El correo no corresponde al dominio institucional del rol seleccionado."
+            "mensaje": (
+                "El correo no corresponde al dominio "
+                "institucional del rol seleccionado."
+            )
         }), 400
 
     # Los estudiantes quedan activos y los profesores pendientes.
-    estado_cuenta = "activo" if rol == "estudiante" else "pendiente"
+    estado_cuenta = (
+        "activo" if rol == "estudiante" else "pendiente"
+    )
 
     # Guardar la contraseña mediante un hash seguro.
     contrasena_hash = generate_password_hash(contrasena)
@@ -135,7 +308,9 @@ def registrar_usuario():
                         activo,
                         estado_cuenta
                     )
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, TRUE, %s)
+                    VALUES (
+                        %s, %s, %s, %s, %s, %s, %s, TRUE, %s
+                    )
                     RETURNING id_usuario;
                     """,
                     (
@@ -161,7 +336,7 @@ def registrar_usuario():
             mensaje = (
                 "Tu solicitud fue recibida. "
                 "Tu cuenta quedará pendiente hasta que "
-                "un coordinador la autorice."
+                "un administrador la autorice."
             )
 
         return jsonify({
@@ -176,11 +351,17 @@ def registrar_usuario():
         # Correo o documento duplicado.
         if getattr(error, "sqlstate", None) == "23505":
             return jsonify({
-                "mensaje": "Ya existe una cuenta con ese correo o documento."
+                "mensaje": (
+                    "Ya existe una cuenta con ese "
+                    "correo o documento."
+                )
             }), 409
 
         return jsonify({
-            "mensaje": "No fue posible crear la cuenta. Inténtalo más tarde."
+            "mensaje": (
+                "No fue posible crear la cuenta. "
+                "Inténtalo más tarde."
+            )
         }), 500
 
     finally:

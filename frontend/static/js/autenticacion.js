@@ -95,28 +95,51 @@ function validarLongitudContrasena(campo) {
 
 
 // ======================================================
-// 5. INICIO DE SESIÓN
-// Pendiente para una historia de usuario posterior.
+// 5. INICIO DE SESIÓN - HU3
 // ======================================================
 
-function iniciarSesion() {
-    const correo = document.getElementById("correo-login");
-    const contrasena = document.getElementById("contrasena-login");
 
-    if (!validarCorreo(correo)) {
+async function iniciarSesion() {
+    const correo = document.getElementById("correo-login").value.trim();
+    const contrasena = document.getElementById("contrasena-login").value;
+
+    if (!correo || !contrasena) {
+        alert("Ingresa tu correo y contraseña.");
         return;
     }
 
-    if (!contrasena.value) {
-        alert("Ingresa tu contraseña.");
-        contrasena.focus();
-        return;
-    }
+    try {
+        const respuesta = await fetch("/api/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                correo: correo,
+                contrasena: contrasena
+            })
+        });
 
-    alert(
-        "El inicio de sesión se conectará en una historia de usuario posterior."
-    );
+        const resultado = await respuesta.json();
+
+        if (!respuesta.ok) {
+            alert(resultado.mensaje || "No fue posible iniciar sesión.");
+            return;
+        }
+
+        const usuario = resultado.usuario;
+
+        alert(
+            `¡Bienvenido a AulaSyn, ${usuario.nombres}!\n` +
+            `Rol: ${usuario.rol}`
+        );
+
+    } catch (error) {
+        console.error("Error al iniciar sesión:", error);
+        alert("No se pudo conectar con el servidor. Inténtalo nuevamente.");
+    }
 }
+
 
 
 // ======================================================
