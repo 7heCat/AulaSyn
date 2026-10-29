@@ -293,20 +293,57 @@ async function registrarUsuario() {
 
 
 // ======================================================
-// 7. RECUPERACIÓN DE CONTRASEÑA
-// Pendiente para una historia de usuario posterior.
+// 7. RECUPERACIÓN DE CONTRASEÑA - HU4
+// "Enviar código" pide el código al correo; "Restablecer contraseña"
+// envía correo + código + nueva contraseña en una sola petición.
 // ======================================================
 
-function enviarCodigoRecuperacion() {
+async function llamarRecuperacion(ruta, datos, boton, textoCarga) {
+    const textoOriginal = boton.innerText;
+    boton.disabled = true;
+    boton.innerText = textoCarga;
+
+    try {
+        const respuesta = await fetch("/api/recuperacion/" + ruta, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(datos)
+        });
+        const resultado = await respuesta.json().catch(function () { return {}; });
+
+        return { ok: respuesta.ok, mensaje: resultado.mensaje || "" };
+    } catch (error) {
+        console.error("Error en recuperación:", error);
+        return {
+            ok: false,
+            mensaje: "No se pudo conectar con el servidor. Inténtalo nuevamente."
+        };
+    } finally {
+        boton.disabled = false;
+        boton.innerText = textoOriginal;
+    }
+}
+
+
+async function enviarCodigoRecuperacion() {
     const correo = document.getElementById("correo-recuperacion");
 
     if (!validarCorreo(correo)) {
         return;
     }
 
-    alert(
-        "La recuperación de contraseña se conectará en una historia de usuario posterior."
+    const r = await llamarRecuperacion(
+        "solicitar",
+        { correo: correo.value.trim().toLowerCase() },
+        document.getElementById("enviar-codigo"),
+        "Enviando..."
     );
+
+    alert(r.mensaje || "No fue posible enviar el código.");
+
+    if (r.ok) {
+        document.getElementById("codigo-recuperacion").focus();
+    }
 }
 
 
@@ -320,8 +357,8 @@ function validarRecuperacion() {
         return false;
     }
 
-    if (!codigo.value.trim()) {
-        alert("Ingresa el código de verificación.");
+    if (!/^\d{6}$/.test(codigo.value.trim())) {
+        alert("Ingresa el código de 6 dígitos que recibiste en tu correo.");
         codigo.focus();
         return false;
     }
@@ -336,6 +373,12 @@ function validarRecuperacion() {
         return false;
     }
 
+    if (!/[A-Za-z]/.test(nueva.value) || !/\d/.test(nueva.value)) {
+        alert("La contraseña debe incluir al menos una letra y un número.");
+        nueva.focus();
+        return false;
+    }
+
     if (nueva.value !== confirmar.value) {
         alert("Las contraseñas no coinciden.");
         confirmar.focus();
@@ -346,14 +389,34 @@ function validarRecuperacion() {
 }
 
 
-function restablecerContrasena() {
+async function restablecerContrasena() {
     if (!validarRecuperacion()) {
         return;
     }
 
-    alert(
-        "La recuperación de contraseña se conectará en una historia de usuario posterior."
+    const r = await llamarRecuperacion(
+        "restablecer",
+        {
+            correo: document.getElementById("correo-recuperacion").value.trim().toLowerCase(),
+            codigo: document.getElementById("codigo-recuperacion").value.trim(),
+            contrasena: document.getElementById("nueva-contrasena").value
+        },
+        document.getElementById("guardar-contrasena"),
+        "Guardando..."
     );
+
+    alert(r.mensaje || "No fue posible restablecer la contraseña.");
+
+    if (!r.ok) {
+        return;
+    }
+
+    ["correo-recuperacion", "codigo-recuperacion",
+     "nueva-contrasena", "confirmar-nueva-contrasena"].forEach(function (id) {
+        document.getElementById(id).value = "";
+    });
+
+    mostrarVista("login");
 }
 
 

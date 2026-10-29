@@ -18,6 +18,7 @@ from werkzeug.security import (
 )
 
 from permisos import requiere_permiso
+from recuperacion import recuperacion_bp
 
 
 app = Flask(
@@ -25,6 +26,8 @@ app = Flask(
     template_folder="../frontend/templates",
     static_folder="../frontend/static"
 )
+
+app.register_blueprint(recuperacion_bp)
 
 
 # Configuración de seguridad de las sesiones.
