@@ -11,10 +11,51 @@ function iniciarAplicacion() {
 
 
 // ======================================================
-// 2. NAVEGACIÓN ENTRE VISTAS
+// 2. NOTIFICACIONES DENTRO DE LA VISTA
+// ======================================================
+
+function mostrarNotificacion(mensaje, tipo = "error") {
+    const notificacion = document.getElementById("notificacion");
+    const texto = document.getElementById("notificacion-mensaje");
+    const icono = document.getElementById("notificacion-icono");
+
+    if (!notificacion || !texto || !icono) {
+        console.error("No se encontró el componente de notificaciones.");
+        return;
+    }
+
+    const configuracion = {
+        error: { icono: "×", clase: "notificacion-error" },
+        advertencia: { icono: "!", clase: "notificacion-advertencia" },
+        exito: { icono: "✓", clase: "notificacion-exito" },
+        info: { icono: "i", clase: "notificacion-info" }
+    };
+
+    const estilo = configuracion[tipo] || configuracion.error;
+
+    texto.textContent = mensaje || "Ocurrió un problema. Inténtalo nuevamente.";
+    icono.textContent = estilo.icono;
+    notificacion.className = "notificacion " + estilo.clase;
+    notificacion.hidden = false;
+}
+
+function ocultarNotificacion() {
+    const notificacion = document.getElementById("notificacion");
+
+    if (notificacion) {
+        notificacion.hidden = true;
+        notificacion.className = "notificacion";
+    }
+}
+
+
+// ======================================================
+// 3. NAVEGACIÓN ENTRE VISTAS
 // ======================================================
 
 function mostrarVista(tipoVista) {
+    ocultarNotificacion();
+
     const vistas = document.querySelectorAll(".vista-autenticacion");
 
     const mensajes = {
@@ -36,7 +77,7 @@ function mostrarVista(tipoVista) {
 
 
 // ======================================================
-// 3. SELECCIÓN DEL ROL
+// 4. SELECCIÓN DEL ROL
 // ======================================================
 
 function seleccionarRol(rol) {
@@ -59,12 +100,12 @@ function seleccionarRol(rol) {
 
 
 // ======================================================
-// 4. VALIDACIONES GENERALES
+// 5. VALIDACIONES GENERALES
 // ======================================================
 
 function validarCorreo(campo) {
     if (!campo || !campo.value.trim()) {
-        alert("Ingresa tu correo institucional.");
+        mostrarNotificacion("Ingresa tu correo institucional.", "advertencia");
 
         if (campo) {
             campo.focus();
@@ -74,7 +115,7 @@ function validarCorreo(campo) {
     }
 
     if (!campo.checkValidity()) {
-        alert("Ingresa un correo con formato válido.");
+        mostrarNotificacion("Ingresa un correo con formato válido.", "advertencia");
         campo.focus();
         return false;
     }
@@ -82,10 +123,9 @@ function validarCorreo(campo) {
     return true;
 }
 
-
 function validarLongitudContrasena(campo) {
     if (campo.value.length < 8) {
-        alert("La contraseña debe tener al menos 8 caracteres.");
+        mostrarNotificacion("La contraseña debe tener al menos 8 caracteres.", "advertencia");
         campo.focus();
         return false;
     }
@@ -95,7 +135,7 @@ function validarLongitudContrasena(campo) {
 
 
 // ======================================================
-// 5. INICIO DE SESIÓN - HU3
+// 6. INICIO DE SESIÓN - HU3
 // ======================================================
 
 
@@ -104,7 +144,7 @@ async function iniciarSesion() {
     const contrasena = document.getElementById("contrasena-login").value;
 
     if (!correo || !contrasena) {
-        alert("Ingresa tu correo y contraseña.");
+        mostrarNotificacion("Ingresa tu correo y contraseña.", "advertencia");
         return;
     }
 
@@ -123,27 +163,30 @@ async function iniciarSesion() {
         const resultado = await respuesta.json();
 
         if (!respuesta.ok) {
-            alert(resultado.mensaje || "No fue posible iniciar sesión.");
+            mostrarNotificacion(
+                resultado.mensaje || "No fue posible iniciar sesión.",
+                "error"
+            );
             return;
         }
 
-        const usuario = resultado.usuario;
-
-        alert(
-            `¡Bienvenido a AulaSyn, ${usuario.nombres}!\n` +
-            `Rol: ${usuario.rol}`
-        );
+        // Redirigir al Dashboard después del inicio de sesión.
+        window.location.href = "/inicio";
 
     } catch (error) {
         console.error("Error al iniciar sesión:", error);
-        alert("No se pudo conectar con el servidor. Inténtalo nuevamente.");
+
+        mostrarNotificacion(
+            "No se pudo conectar con el servidor. Inténtalo nuevamente.",
+            "error"
+        );
     }
 }
 
 
 
 // ======================================================
-// 6. REGISTRO DE USUARIO - HU1
+// 7. REGISTRO DE USUARIO - HU1
 // ======================================================
 
 function validarRegistro() {
@@ -167,7 +210,10 @@ function validarRegistro() {
 
     for (const campo of campos) {
         if (!campo.value.trim()) {
-            alert("Completa todos los campos del registro.");
+            mostrarNotificacion(
+                "Completa todos los campos del registro.",
+                "advertencia"
+            );
             campo.focus();
             return false;
         }
@@ -182,19 +228,23 @@ function validarRegistro() {
     }
 
     if (contrasena.value !== confirmar.value) {
-        alert("Las contraseñas no coinciden.");
+        mostrarNotificacion(
+            "Las contraseñas no coinciden.",
+            "advertencia"
+        );
         confirmar.focus();
         return false;
     }
 
     if (!terminos.checked) {
-        alert("Debes aceptar los términos y las políticas de privacidad.");
+        mostrarNotificacion(
+            "Debes aceptar los términos y las políticas de privacidad.",
+            "advertencia"
+        );
         terminos.focus();
         return false;
     }
 
-    // Validación inicial del dominio en el navegador.
-    // El servidor también realiza esta comprobación.
     const correoNormalizado = correo.value.trim().toLowerCase();
 
     const dominios = {
@@ -204,12 +254,14 @@ function validarRegistro() {
 
     if (!dominios[rol] || !correoNormalizado.endsWith(dominios[rol])) {
         if (rol === "profesor") {
-            alert(
-                "Para registrarte como profesor, utiliza tu correo institucional @profesores.uniajc.edu.co."
+            mostrarNotificacion(
+                "Para registrarte como profesor, utiliza tu correo institucional @profesores.uniajc.edu.co.",
+                "advertencia"
             );
         } else {
-            alert(
-                "Para registrarte como estudiante, utiliza tu correo institucional @estudiante.uniajc.edu.co."
+            mostrarNotificacion(
+                "Para registrarte como estudiante, utiliza tu correo institucional @estudiante.uniajc.edu.co.",
+                "advertencia"
             );
         }
 
@@ -219,7 +271,6 @@ function validarRegistro() {
 
     return true;
 }
-
 
 
 async function registrarUsuario() {
@@ -256,14 +307,21 @@ async function registrarUsuario() {
 
         if (!respuesta.ok) {
             if (respuesta.status === 409) {
-                alert("Ya existe una cuenta con ese correo o documento.");
+                mostrarNotificacion(
+                    "Ya existe una cuenta con ese correo o documento.",
+                    "error"
+                );
             } else {
-                alert(resultado.mensaje || "No fue posible crear la cuenta.");
+                mostrarNotificacion(
+                    resultado.mensaje || "No fue posible crear la cuenta.",
+                    "error"
+                );
             }
+
             return;
         }
 
-        alert(resultado.mensaje);
+        const mensajeExito = resultado.mensaje || "Tu cuenta se creó correctamente.";
 
         document.getElementById("nombres").value = "";
         document.getElementById("apellidos").value = "";
@@ -275,13 +333,14 @@ async function registrarUsuario() {
 
         seleccionarRol("estudiante");
         mostrarVista("login");
+        mostrarNotificacion(mensajeExito, "exito");
 
     } catch (error) {
         console.error("Error durante el registro:", error);
 
-        alert(
-            "Ocurrió un problema al procesar la respuesta del servidor. " +
-            "Revisa la consola del navegador para conocer el detalle."
+        mostrarNotificacion(
+            "Ocurrió un problema al procesar la respuesta del servidor. Revisa la consola del navegador para conocer el detalle.",
+            "error"
         );
 
     } finally {
@@ -291,33 +350,42 @@ async function registrarUsuario() {
 }
 
 
-
 // ======================================================
-// 7. RECUPERACIÓN DE CONTRASEÑA - HU4
-// "Enviar código" pide el código al correo; "Restablecer contraseña"
-// envía correo + código + nueva contraseña en una sola petición.
+// 8. RECUPERACIÓN DE CONTRASEÑA - HU4
 // ======================================================
 
 async function llamarRecuperacion(ruta, datos, boton, textoCarga) {
     const textoOriginal = boton.innerText;
+
     boton.disabled = true;
     boton.innerText = textoCarga;
 
     try {
         const respuesta = await fetch("/api/recuperacion/" + ruta, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json"
+            },
             body: JSON.stringify(datos)
         });
-        const resultado = await respuesta.json().catch(function () { return {}; });
 
-        return { ok: respuesta.ok, mensaje: resultado.mensaje || "" };
+        const resultado = await respuesta.json().catch(function () {
+            return {};
+        });
+
+        return {
+            ok: respuesta.ok,
+            mensaje: resultado.mensaje || ""
+        };
+
     } catch (error) {
         console.error("Error en recuperación:", error);
+
         return {
             ok: false,
             mensaje: "No se pudo conectar con el servidor. Inténtalo nuevamente."
         };
+
     } finally {
         boton.disabled = false;
         boton.innerText = textoOriginal;
@@ -334,12 +402,17 @@ async function enviarCodigoRecuperacion() {
 
     const r = await llamarRecuperacion(
         "solicitar",
-        { correo: correo.value.trim().toLowerCase() },
+        {
+            correo: correo.value.trim().toLowerCase()
+        },
         document.getElementById("enviar-codigo"),
         "Enviando..."
     );
 
-    alert(r.mensaje || "No fue posible enviar el código.");
+    mostrarNotificacion(
+        r.mensaje || "No fue posible enviar el código.",
+        r.ok ? "exito" : "error"
+    );
 
     if (r.ok) {
         document.getElementById("codigo-recuperacion").focus();
@@ -358,13 +431,19 @@ function validarRecuperacion() {
     }
 
     if (!/^\d{6}$/.test(codigo.value.trim())) {
-        alert("Ingresa el código de 6 dígitos que recibiste en tu correo.");
+        mostrarNotificacion(
+            "Ingresa el código de 6 dígitos que recibiste en tu correo.",
+            "advertencia"
+        );
         codigo.focus();
         return false;
     }
 
     if (!nueva.value || !confirmar.value) {
-        alert("Completa los dos campos de contraseña.");
+        mostrarNotificacion(
+            "Completa los dos campos de contraseña.",
+            "advertencia"
+        );
         nueva.focus();
         return false;
     }
@@ -374,13 +453,19 @@ function validarRecuperacion() {
     }
 
     if (!/[A-Za-z]/.test(nueva.value) || !/\d/.test(nueva.value)) {
-        alert("La contraseña debe incluir al menos una letra y un número.");
+        mostrarNotificacion(
+            "La contraseña debe incluir al menos una letra y un número.",
+            "advertencia"
+        );
         nueva.focus();
         return false;
     }
 
     if (nueva.value !== confirmar.value) {
-        alert("Las contraseñas no coinciden.");
+        mostrarNotificacion(
+            "Las contraseñas no coinciden.",
+            "advertencia"
+        );
         confirmar.focus();
         return false;
     }
@@ -405,26 +490,42 @@ async function restablecerContrasena() {
         "Guardando..."
     );
 
-    alert(r.mensaje || "No fue posible restablecer la contraseña.");
+    mostrarNotificacion(
+        r.mensaje || "No fue posible restablecer la contraseña.",
+        r.ok ? "exito" : "error"
+    );
 
     if (!r.ok) {
         return;
     }
 
-    ["correo-recuperacion", "codigo-recuperacion",
-     "nueva-contrasena", "confirmar-nueva-contrasena"].forEach(function (id) {
+    [
+        "correo-recuperacion",
+        "codigo-recuperacion",
+        "nueva-contrasena",
+        "confirmar-nueva-contrasena"
+    ].forEach(function (id) {
         document.getElementById(id).value = "";
     });
 
     mostrarVista("login");
+    mostrarNotificacion(
+        r.mensaje || "Tu contraseña se restableció correctamente.",
+        "exito"
+    );
 }
 
 
 // ======================================================
-// 8. CONFIGURACIÓN DE EVENTOS
+// 9. CONFIGURACIÓN DE EVENTOS
 // ======================================================
 
 function iniciarEventos() {
+    document.getElementById("cerrar-notificacion").addEventListener(
+        "click",
+        ocultarNotificacion
+    );
+
     document.getElementById("ir-registro").addEventListener(
         "click",
         function () {

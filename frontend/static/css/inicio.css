@@ -1,0 +1,367 @@
+
+/* =========================================
+   DASHBOARD
+========================================= */
+
+.dashboard {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    max-width: 1500px;
+    margin: 0 auto;
+}
+
+
+/* =========================================
+   BIENVENIDA
+========================================= */
+
+.bienvenida-dashboard {
+    min-height: 190px;
+    padding: 30px 35px;
+    border-radius: 17px;
+    background: linear-gradient(115deg, #173665, #2868bd);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 9px 22px rgba(35, 76, 135, 0.15);
+}
+
+.etiqueta-dashboard {
+    color: #a9cbff;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.6px;
+}
+
+.bienvenida-dashboard h2 {
+    color: #ffffff;
+    font-size: 27px;
+    margin-top: 12px;
+    font-weight: 750;
+}
+
+.bienvenida-dashboard p {
+    color: #d3e2f8;
+    font-size: 13px;
+    margin-top: 9px;
+    max-width: 490px;
+    line-height: 1.7;
+}
+
+.ilustracion-dashboard {
+    width: 175px;
+    height: 130px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.ilustracion-dashboard span {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    background: rgba(255, 255, 255, 0.10);
+    backdrop-filter: blur(5px);
+    border-radius: 18px;
+}
+
+.ilustracion-dashboard span:nth-child(1) {
+    width: 80px;
+    height: 80px;
+    font-size: 40px;
+}
+
+.ilustracion-dashboard span:nth-child(2) {
+    width: 48px;
+    height: 48px;
+    font-size: 23px;
+    top: 0;
+    right: 5px;
+}
+
+.ilustracion-dashboard span:nth-child(3) {
+    width: 42px;
+    height: 42px;
+    font-size: 22px;
+    bottom: 0;
+    left: 0;
+}
+
+
+/* =========================================
+   TÍTULOS DE SECCIÓN
+========================================= */
+
+.titulo-seccion-dashboard {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.titulo-seccion-dashboard h3 {
+    color: #192840;
+    font-size: 17px;
+    font-weight: 750;
+}
+
+.titulo-seccion-dashboard p {
+    color: #8492a8;
+    font-size: 11px;
+    margin-top: 5px;
+}
+
+
+/* =========================================
+   INDICADORES
+========================================= */
+
+.indicadores-dashboard {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 17px;
+}
+
+.tarjeta-indicador {
+    background: #f4f7fc;
+    border: 1px solid #dfe7f1;
+    border-radius: 14px;
+    padding: 20px 17px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-height: 105px;
+    box-shadow: 0 4px 12px rgba(39, 64, 101, 0.035);
+}
+
+.icono-indicador {
+    width: 45px;
+    height: 45px;
+    min-width: 45px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 23px;
+}
+
+.icono-indicador.azul,
+.icono-acceso.azul {
+    background: #e1edff;
+    color: #3479d5;
+}
+
+.icono-indicador.verde,
+.icono-acceso.verde {
+    background: #def5eb;
+    color: #279b70;
+}
+
+.icono-indicador.morado {
+    background: #eee6ff;
+    color: #8759d5;
+}
+
+.icono-indicador.naranja,
+.icono-acceso.naranja {
+    background: #fff0df;
+    color: #d68a35;
+}
+
+.tarjeta-indicador div:last-child {
+    display: flex;
+    flex-direction: column;
+}
+
+.tarjeta-indicador span {
+    color: #71819a;
+    font-size: 11px;
+}
+
+.tarjeta-indicador strong {
+    color: #192840;
+    font-size: 23px;
+    margin-top: 3px;
+}
+
+.tarjeta-indicador small {
+    color: #9ba8ba;
+    font-size: 9px;
+    margin-top: 3px;
+}
+
+
+/* =========================================
+   ACCESOS RÁPIDOS
+========================================= */
+
+.accesos-dashboard {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 15px;
+}
+
+.tarjeta-acceso {
+    background: #f4f7fc;
+    border: 1px solid #dfe7f1;
+    border-radius: 14px;
+    padding: 19px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    min-width: 0;
+    transition: all 0.2s ease;
+}
+
+a.tarjeta-acceso:hover {
+    transform: translateY(-3px);
+    border-color: #a8c9f3;
+    box-shadow: 0 7px 17px rgba(39, 89, 151, 0.09);
+}
+
+.icono-acceso {
+    width: 46px;
+    height: 46px;
+    min-width: 46px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 23px;
+}
+
+.tarjeta-acceso h4 {
+    color: #25354d;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.tarjeta-acceso p {
+    color: #8492a8;
+    font-size: 10px;
+    margin-top: 6px;
+    line-height: 1.5;
+}
+
+.flecha-acceso {
+    color: #5189ce;
+    font-size: 22px;
+    margin-left: auto;
+}
+
+.estado-pendiente {
+    margin-left: auto;
+    white-space: nowrap;
+    font-size: 9px;
+    color: #8190a6;
+    background: #e9eef6;
+    padding: 6px 9px;
+    border-radius: 20px;
+}
+
+.acceso-pendiente {
+    opacity: 0.8;
+}
+
+
+/* =========================================
+   INFORMACIÓN INFERIOR
+========================================= */
+
+.panel-informativo {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 20px;
+    background: #e1eaf7;
+    border: 1px solid #d5e1f0;
+    border-radius: 13px;
+}
+
+.icono-informacion {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    border-radius: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #3479d5;
+    background: #f1f6ff;
+    font-size: 22px;
+}
+
+.panel-informativo h4 {
+    color: #2b466e;
+    font-size: 12px;
+}
+
+.panel-informativo p {
+    color: #7789a4;
+    font-size: 10px;
+    margin-top: 5px;
+    line-height: 1.6;
+}
+
+.version-dashboard {
+    display: flex;
+    justify-content: space-between;
+    color: #94a1b4;
+    font-size: 10px;
+    padding: 0 3px;
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 1050px) {
+
+    .indicadores-dashboard {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+@media (max-width: 700px) {
+
+    .bienvenida-dashboard {
+        padding: 24px;
+    }
+
+    .bienvenida-dashboard h2 {
+        font-size: 21px;
+    }
+
+    .ilustracion-dashboard {
+        display: none;
+    }
+
+    .accesos-dashboard {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+@media (max-width: 450px) {
+
+    .indicadores-dashboard {
+        grid-template-columns: 1fr;
+    }
+
+    .tarjeta-indicador {
+        min-height: 85px;
+    }
+
+    .estado-pendiente {
+        display: none;
+    }
+
+}

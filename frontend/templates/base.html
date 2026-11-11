@@ -1,0 +1,323 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block titulo %}AulaSyn{% endblock %}</title>
+
+    <!-- ESTILOS GENERALES -->
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/base.css') }}">
+
+    <!-- ESTILOS DE VENTANAS EMERGENTES -->
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/modales.css') }}">
+
+    <!-- ESTILOS DE CADA VISTA -->
+    {% block estilos %}{% endblock %}
+</head>
+
+<body>
+
+    <div class="aplicacion">
+
+        <!-- =====================================
+             MENÚ LATERAL
+        ====================================== -->
+        <aside class="menu-lateral">
+
+            <!-- LOGO -->
+            <div class="marca-aulasyn">
+                <img
+                    src="{{ url_for('static', filename='img/Logo AulaSyn.png') }}"
+                    alt="Logo AulaSyn"
+                >
+                <span>AulaSyn</span>
+            </div>
+
+            <!-- NAVEGACIÓN -->
+            <nav class="navegacion">
+
+                <div class="titulo-menu">PRINCIPAL</div>
+
+                <a href="{{ url_for('dashboard') }}"
+                   class="opcion-menu {% if request.path == '/inicio' %}activa{% endif %}">
+                    <span class="icono-menu">▦</span>
+                    <span>Dashboard</span>
+                </a>
+
+                <div class="titulo-menu">MÓDULOS ACADÉMICOS</div>
+
+                {% if session.get('rol') in ['administrador', 'coordinador'] %}
+                <a href="{{ url_for('gestion_docentes') }}"
+                   class="opcion-menu {% if request.path == '/docentes' %}activa{% endif %}">
+                    <span class="icono-menu">♙</span>
+                    <span>Gestión de Docentes</span>
+                </a>
+                {% endif %}
+
+                <a href="#" class="opcion-menu proximamente">
+                    <span class="icono-menu">▤</span>
+                    <span>Gestión de Cursos</span>
+                </a>
+
+                <a href="#" class="opcion-menu proximamente">
+                    <span class="icono-menu">⌂</span>
+                    <span>Gestión de Salones</span>
+                </a>
+
+                <a href="#" class="opcion-menu proximamente">
+                    <span class="icono-menu">▱</span>
+                    <span>Programas Académicos</span>
+                </a>
+
+                <a href="#" class="opcion-menu proximamente">
+                    <span class="icono-menu">◷</span>
+                    <span>Generación de Horarios IA</span>
+                </a>
+
+                <a href="#" class="opcion-menu proximamente">
+                    <span class="icono-menu">◫</span>
+                    <span>Modelo de datos</span>
+                </a>
+
+                <a href="#" class="opcion-menu proximamente">
+                    <span class="icono-menu">◇</span>
+                    <span>Restricciones Académicas</span>
+                </a>
+
+                <a href="#" class="opcion-menu proximamente">
+                    <span class="icono-menu">✧</span>
+                    <span>Centro de Innovación y Retos</span>
+                </a>
+
+                <a href="#" class="opcion-menu proximamente">
+                    <span class="icono-menu">▣</span>
+                    <span>Horario Final</span>
+                </a>
+
+                <div class="titulo-menu">ADMINISTRACIÓN</div>
+
+                <a href="#" class="opcion-menu proximamente">
+                    <span class="icono-menu">⚙</span>
+                    <span>Configuración</span>
+                </a>
+
+            </nav>
+
+            <!-- USUARIO Y CIERRE DE SESIÓN -->
+            <div class="usuario-menu">
+
+                <div class="avatar-usuario">
+                    {{ session.get('nombres', 'U')[0]|upper }}
+                </div>
+
+                <div class="datos-usuario">
+                    <strong>
+                        {{ session.get('nombres', 'Usuario') }}
+                        {{ session.get('apellidos', '') }}
+                    </strong>
+
+                    <span>
+                        {{ session.get('rol', 'Usuario')|capitalize }}
+                    </span>
+                </div>
+
+                <button type="button"
+                        id="cerrar-sesion"
+                        class="boton-cerrar-sesion"
+                        title="Cerrar sesión">
+                    ↪
+                </button>
+
+            </div>
+
+        </aside>
+
+        <!-- =====================================
+             PANEL PRINCIPAL
+        ====================================== -->
+        <div class="contenido-principal">
+
+            <!-- BARRA SUPERIOR -->
+            <header class="barra-superior">
+
+                <div class="encabezado-pagina">
+                    <h1>
+                        {% block encabezado %}
+                            Bienvenido a AulaSyn
+                        {% endblock %}
+                    </h1>
+
+                    <p>
+                        Plataforma de IA de Horarios Académicos — 2026
+                    </p>
+                </div>
+
+                <div class="acciones-superiores">
+
+                    <div class="buscador-general">
+                        <span>⌕</span>
+                        <input
+                            type="search"
+                            placeholder="Buscar..."
+                            aria-label="Buscar"
+                        >
+                    </div>
+
+                    <div class="avatar-superior">
+                        {{ session.get('nombres', 'U')[0]|upper }}
+                    </div>
+
+                </div>
+
+            </header>
+
+            <!-- CONTENIDO DE CADA VISTA -->
+            <main class="contenido-vista">
+                {% block contenido %}{% endblock %}
+            </main>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================
+         VENTANA EMERGENTE REUTILIZABLE
+    ====================================== -->
+    <div class="modal-fondo"
+         id="modal-fondo"
+         aria-hidden="true">
+
+        <div class="modal-aulasyn"
+             role="dialog"
+             aria-modal="true"
+             aria-labelledby="modal-titulo"
+             aria-describedby="modal-mensaje">
+
+            <div class="modal-cabecera">
+
+                <div class="modal-icono informacion"
+                     id="modal-icono">
+                    ?
+                </div>
+
+                <h2 class="modal-titulo" id="modal-titulo">
+                    Confirmar acción
+                </h2>
+
+            </div>
+
+            <p class="modal-mensaje" id="modal-mensaje">
+                ¿Deseas continuar?
+            </p>
+
+            <div class="modal-acciones">
+
+                <button type="button"
+                        class="modal-boton cancelar"
+                        id="modal-cancelar">
+                    Cancelar
+                </button>
+
+                <button type="button"
+                        class="modal-boton confirmar"
+                        id="modal-confirmar">
+                    Confirmar
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- CONTENEDOR DE NOTIFICACIONES -->
+    <div class="contenedor-notificaciones"
+         id="contenedor-notificaciones"
+         aria-live="polite"
+         aria-atomic="false">
+    </div>
+
+
+    <!-- SISTEMA DE MODALES -->
+    <script src="{{ url_for('static', filename='js/modales.js') }}"></script>
+
+
+    <!-- CIERRE DE SESIÓN -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const botonCerrar = document.getElementById("cerrar-sesion");
+
+            if (botonCerrar) {
+
+                botonCerrar.addEventListener("click", async function () {
+
+                    const confirmar = await window.AulaSynModal.confirmar({
+
+                        titulo: "Cerrar sesión",
+                        mensaje: "¿Estás seguro de que deseas salir de tu cuenta?",
+                        icono: "?",
+                        tipo: "advertencia",
+                        textoCancelar: "Cancelar",
+                        textoConfirmar: "Cerrar sesión"
+
+                    });
+
+                    if (!confirmar) {
+                        return;
+                    }
+
+                    botonCerrar.disabled = true;
+
+                    try {
+
+                        const respuesta = await fetch("/api/logout", {
+                            method: "POST"
+                        });
+
+                        if (respuesta.ok) {
+
+                            window.location.href = "/";
+
+                        } else {
+
+                            window.AulaSynModal.notificar(
+                                "No fue posible cerrar la sesión.",
+                                "error"
+                            );
+
+                            botonCerrar.disabled = false;
+
+                        }
+
+                    } catch (error) {
+
+                        console.error("Error al cerrar sesión:", error);
+
+                        window.AulaSynModal.notificar(
+                            "No se pudo conectar con el servidor.",
+                            "error"
+                        );
+
+                        botonCerrar.disabled = false;
+
+                    }
+
+                });
+
+            }
+
+        });
+    </script>
+
+    <!-- SCRIPTS DE CADA VISTA -->
+    {% block scripts %}{% endblock %}
+
+</body>
+</html>

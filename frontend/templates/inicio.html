@@ -1,0 +1,162 @@
+
+{% extends "base.html" %}
+
+{% block titulo %}Inicio | AulaSyn{% endblock %}
+
+{% block encabezado %}Bienvenido a AulaSyn{% endblock %}
+
+{% block estilos %}
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='css/inicio.css') }}">
+{% endblock %}
+
+{% block contenido %}
+
+<section class="dashboard">
+
+    <!-- BIENVENIDA -->
+    <div class="bienvenida-dashboard">
+        <div>
+            <span class="etiqueta-dashboard">PLATAFORMA ACADÉMICA</span>
+
+            <h2>
+                ¡Hola, {{ session.get('nombres', 'Usuario') }}!
+            </h2>
+
+            <p>
+                Bienvenido a AulaSyn. Desde aquí podrás acceder
+                a las herramientas de gestión académica.
+            </p>
+        </div>
+
+        <div class="ilustracion-dashboard">
+            <span>✦</span>
+            <span>▤</span>
+            <span>⌘</span>
+        </div>
+    </div>
+
+
+    <!-- INDICADORES -->
+    <div class="titulo-seccion-dashboard">
+        <div>
+            <h3>Resumen general</h3>
+            <p>Información principal de la plataforma.</p>
+        </div>
+    </div>
+
+    <div class="indicadores-dashboard">
+
+        <article class="tarjeta-indicador">
+            <div class="icono-indicador azul">♙</div>
+            <div>
+                <span>Docentes</span>
+                <strong>--</strong>
+                <small>Información pendiente</small>
+            </div>
+        </article>
+
+        <article class="tarjeta-indicador">
+            <div class="icono-indicador verde">▤</div>
+            <div>
+                <span>Asignaturas</span>
+                <strong>--</strong>
+                <small>Información pendiente</small>
+            </div>
+        </article>
+
+        <article class="tarjeta-indicador">
+            <div class="icono-indicador morado">⌂</div>
+            <div>
+                <span>Salones</span>
+                <strong>--</strong>
+                <small>Información pendiente</small>
+            </div>
+        </article>
+
+        <article class="tarjeta-indicador">
+            <div class="icono-indicador naranja">◷</div>
+            <div>
+                <span>Horarios</span>
+                <strong>--</strong>
+                <small>Información pendiente</small>
+            </div>
+        </article>
+
+    </div>
+
+
+    <!-- ACCESOS RÁPIDOS -->
+    <div class="titulo-seccion-dashboard">
+        <div>
+            <h3>Accesos rápidos</h3>
+            <p>Ingresa directamente a los módulos disponibles.</p>
+        </div>
+    </div>
+
+    <div class="accesos-dashboard">
+
+        {% if session.get('rol') in ['administrador', 'coordinador'] %}
+
+        <a href="{{ url_for('gestion_docentes') }}"
+           class="tarjeta-acceso">
+
+            <div class="icono-acceso azul">♙</div>
+
+            <div>
+                <h4>Gestión de Docentes</h4>
+                <p>Administra la información, disponibilidad y asignaturas.</p>
+            </div>
+
+            <span class="flecha-acceso">→</span>
+        </a>
+
+        {% endif %}
+
+        <div class="tarjeta-acceso acceso-pendiente">
+            <div class="icono-acceso verde">▤</div>
+            <div>
+                <h4>Gestión de Cursos</h4>
+                <p>Administración de cursos y grupos académicos.</p>
+            </div>
+            <span class="estado-pendiente">Próximamente</span>
+        </div>
+
+        <div class="tarjeta-acceso acceso-pendiente">
+            <div class="icono-acceso naranja">◷</div>
+            <div>
+                <h4>Generación de Horarios</h4>
+                <p>Organización de la programación académica.</p>
+            </div>
+            <span class="estado-pendiente">Próximamente</span>
+        </div>
+
+    </div>
+
+
+    <!-- INFORMACIÓN INFERIOR -->
+    <div class="informacion-dashboard">
+
+        <div class="panel-informativo">
+            <div class="icono-informacion">✧</div>
+
+            <div>
+                <h4>Inteligencia e innovación académica</h4>
+                <p>
+                    AulaSyn integra herramientas de inteligencia artificial
+                    para apoyar la organización y planificación de horarios
+                    académicos.
+                </p>
+            </div>
+        </div>
+
+        <div class="version-dashboard">
+            <span>AulaSyn</span>
+            <span>Versión académica 2026</span>
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

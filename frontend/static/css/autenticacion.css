@@ -1,5 +1,7 @@
+/* ======================================================
+   CONFIGURACIÓN GENERAL
+====================================================== */
 
-/* CONFIGURACIÓN GENERAL */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -21,7 +23,6 @@ body {
     color: var(--texto);
     background: var(--fondo);
     min-height: 100vh;
-
     margin: 0;
     padding: 0;
     width: 100%;
@@ -38,20 +39,31 @@ button {
 }
 
 
-/* Oculta las vistas que no están seleccionadas */
+/* ======================================================
+   OCULTAR VISTAS NO SELECCIONADAS
+====================================================== */
+
 .vista-autenticacion[hidden] {
     display: none !important;
 }
 
 
-/* DISTRIBUCIÓN PRINCIPAL */
+/* ======================================================
+   DISTRIBUCIÓN PRINCIPAL
+====================================================== */
+
 .pagina-autenticacion {
     display: grid;
-    grid-template-columns: 36% 60%;
+    grid-template-columns: 36% minmax(0, 1fr);
+    width: 100%;
     min-height: 100vh;
 }
 
-/* PANEL INSTITUCIONAL */
+
+/* ======================================================
+   PANEL INSTITUCIONAL
+====================================================== */
+
 .panel-institucional {
     position: relative;
     display: flex;
@@ -74,7 +86,6 @@ button {
     background-size: cover 100;
     background-position: left;
     background-repeat: no-repeat;
-    
 }
 
 .logo-institucional {
@@ -111,7 +122,11 @@ button {
     line-height: 1.6;
 }
 
-/* PANEL DERECHO */
+
+/* ======================================================
+   PANEL DERECHO
+====================================================== */
+
 .panel-principal {
     position: relative;
     display: flex;
@@ -134,27 +149,9 @@ button {
 }
 
 
-
-/*.logo-libro {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 44px;
-    height: 44px;
-    color: var(--azul-principal);
-    font-size: 25px;
-    font-weight: 800;
-    background: var(--blanco);
-    border: 1px solid #dce6f5;
-    border-radius: 8px;
-    box-shadow: 0 3px 10px rgb(28 71 125 / 15%);
-}
-
-.logo-libro.pequeño {
-    width: 34px;
-    height: 34px;
-    font-size: 19px;
-}*/
+/* ======================================================
+   LOGOTIPOS
+====================================================== */
 
 .logo-libro {
     display: inline-flex;
@@ -193,7 +190,9 @@ button {
 }
 
 
-
+/* ======================================================
+   TARJETA DE AUTENTICACIÓN
+====================================================== */
 
 .tarjeta-autenticacion {
     width: 100%;
@@ -241,7 +240,11 @@ button {
     line-height: 1.5;
 }
 
-/* CAMPOS */
+
+/* ======================================================
+   CAMPOS
+====================================================== */
+
 .campo {
     display: flex;
     flex-direction: column;
@@ -278,7 +281,11 @@ button {
     color: #929eb0;
 }
 
-/* OPCIONES Y ENLACES */
+
+/* ======================================================
+   OPCIONES Y ENLACES
+====================================================== */
+
 .opciones-login {
     display: flex;
     align-items: center;
@@ -308,7 +315,11 @@ button {
     font-size: 12px;
 }
 
-/* BOTONES */
+
+/* ======================================================
+   BOTONES
+====================================================== */
+
 .boton-principal,
 .boton-secundario {
     width: 100%;
@@ -364,8 +375,10 @@ button {
 }
 
 
+/* ======================================================
+   SELECTOR DE ROL
+====================================================== */
 
-/* SELECTOR DE ROL */
 .selector-rol {
     display: flex;
     width: 100%;
@@ -393,7 +406,11 @@ button {
     box-shadow: 0 3px 8px rgb(37 94 172 / 22%);
 }
 
-/* CAMPOS EN DOS COLUMNAS */
+
+/* ======================================================
+   CAMPOS EN DOS COLUMNAS
+====================================================== */
+
 .fila-campos {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -415,7 +432,11 @@ button {
     accent-color: var(--azul-principal);
 }
 
-/* AJUSTES DE LOS FORMULARIOS DINÁMICOS */
+
+/* ======================================================
+   AJUSTES DE LOS FORMULARIOS DINÁMICOS
+====================================================== */
+
 #contenido-formulario .descripcion {
     margin-bottom: 18px;
     color: var(--texto-secundario);
@@ -449,7 +470,167 @@ button {
     font-size: 12px;
 }
 
-/* ADAPTACIÓN A PANTALLAS PEQUEÑAS */
+
+/* ======================================================
+   FONDO CON ILUSTRACIONES DEL PANEL DERECHO
+====================================================== */
+
+.panel-principal {
+    position: relative;
+    isolation: isolate;
+    min-width: 0;
+    width: 100%;
+    background-color: #dce5f0;
+}
+
+.panel-principal::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+
+    background-image: url("../img/IMG panel derecho.png");
+    background-repeat: repeat;
+    background-position: center;
+    background-size: 650px auto;
+
+    opacity: 0.50;
+}
+
+
+/* ======================================================
+   NOTIFICACIONES INTEGRADAS EN LA TARJETA
+====================================================== */
+
+.notificacion {
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+    width: 100%;
+    margin: 0 0 20px;
+    padding: 13px 14px;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    animation: aparecerNotificacion 0.22s ease-out;
+}
+
+.notificacion[hidden] {
+    display: none !important;
+}
+
+.notificacion-icono {
+    display: flex;
+    flex: 0 0 22px;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    font-size: 15px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.notificacion-mensaje {
+    flex: 1;
+    margin: 1px 0 0;
+    font-size: 12px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.cerrar-notificacion {
+    flex: 0 0 auto;
+    padding: 0 2px;
+    color: inherit;
+    background: transparent;
+    border: 0;
+    font-size: 20px;
+    line-height: 1;
+    opacity: 0.7;
+}
+
+.cerrar-notificacion:hover {
+    opacity: 1;
+}
+
+
+/* MENSAJES DE ERROR */
+
+.notificacion-error {
+    color: #8f2632;
+    background: #fcebec;
+    border-color: #f4c9cd;
+}
+
+.notificacion-error .notificacion-icono {
+    color: #ffffff;
+    background: #d93645;
+}
+
+
+/* MENSAJES DE ADVERTENCIA */
+
+.notificacion-advertencia {
+    color: #76551b;
+    background: #fff4df;
+    border-color: #f1dfb8;
+}
+
+.notificacion-advertencia .notificacion-icono {
+    color: #ffffff;
+    background: #c48619;
+}
+
+
+/* MENSAJES DE ÉXITO */
+
+.notificacion-exito {
+    color: #28633e;
+    background: #e7f5ec;
+    border-color: #c6e8d1;
+}
+
+.notificacion-exito .notificacion-icono {
+    color: #ffffff;
+    background: #27834b;
+}
+
+
+/* MENSAJES INFORMATIVOS */
+
+.notificacion-info {
+    color: #24527f;
+    background: #e8f2fc;
+    border-color: #c9def4;
+}
+
+.notificacion-info .notificacion-icono {
+    color: #ffffff;
+    background: #3478dc;
+}
+
+
+/* ANIMACIÓN DE ENTRADA */
+
+@keyframes aparecerNotificacion {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/* ======================================================
+   ADAPTACIÓN A PANTALLAS PEQUEÑAS
+====================================================== */
+
 @media (max-width: 520px) {
     .fila-campos {
         grid-template-columns: 1fr;
@@ -459,10 +640,17 @@ button {
     .opcion-rol {
         font-size: 11px;
     }
+
+    .notificacion {
+        padding: 11px 12px;
+    }
 }
 
 
-/* ADAPTACIÓN A CELULARES */
+/* ======================================================
+   ADAPTACIÓN A CELULARES
+====================================================== */
+
 @media (max-width: 800px) {
     .pagina-autenticacion {
         grid-template-columns: 1fr;

@@ -1,0 +1,403 @@
+
+/* =========================================
+   CONFIGURACIÓN GENERAL
+========================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #e8eef7;
+    color: #172238;
+    min-height: 100vh;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+button,
+input {
+    font-family: inherit;
+}
+
+
+/* =========================================
+   ESTRUCTURA PRINCIPAL
+========================================= */
+
+.aplicacion {
+    display: flex;
+    min-height: 100vh;
+    width: 100%;
+}
+
+
+/* =========================================
+   MENÚ LATERAL
+========================================= */
+
+.menu-lateral {
+    width: 250px;
+    min-width: 250px;
+    background: #101a30;
+    color: #a5b4cc;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    border-right: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+
+/* LOGO */
+
+.marca-aulasyn {
+    height: 85px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 22px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.marca-aulasyn img {
+    width: 42px;
+    height: 42px;
+    object-fit: contain;
+}
+
+.marca-aulasyn span {
+    font-size: 19px;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: -0.4px;
+}
+
+
+/* NAVEGACIÓN */
+
+.navegacion {
+    padding: 20px 12px;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.titulo-menu {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    color: #52627f;
+    margin: 13px 8px 10px;
+}
+
+.opcion-menu {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 11px 12px;
+    margin-bottom: 5px;
+    border-radius: 9px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #91a1bb;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.icono-menu {
+    width: 20px;
+    min-width: 20px;
+    font-size: 18px;
+    text-align: center;
+}
+
+.opcion-menu:hover {
+    background: rgba(255, 255, 255, 0.07);
+    color: #ffffff;
+}
+
+.opcion-menu.activa {
+    background: linear-gradient(
+        90deg,
+        #2868c7,
+        #1c3768
+    );
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.opcion-menu.activa::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 8px;
+    bottom: 8px;
+    width: 3px;
+    background: #55a0ff;
+    border-radius: 5px;
+}
+
+.opcion-menu.proximamente {
+    opacity: 0.75;
+}
+
+
+/* =========================================
+   USUARIO DEL MENÚ
+========================================= */
+
+.usuario-menu {
+    min-height: 75px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+    background: rgba(0, 0, 0, 0.10);
+}
+
+.avatar-usuario,
+.avatar-superior {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    border-radius: 11px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #438af2, #24519a);
+    color: white;
+    font-size: 15px;
+    font-weight: 700;
+    box-shadow: 0 3px 10px rgba(37, 93, 175, 0.25);
+}
+
+.datos-usuario {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    flex: 1;
+}
+
+.datos-usuario strong {
+    color: #e8eef9;
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.datos-usuario span {
+    color: #71829f;
+    font-size: 11px;
+    margin-top: 3px;
+}
+
+.boton-cerrar-sesion {
+    border: none;
+    background: transparent;
+    color: #8293ae;
+    font-size: 21px;
+    cursor: pointer;
+    padding: 5px;
+    transition: color 0.2s;
+}
+
+.boton-cerrar-sesion:hover {
+    color: #ffffff;
+}
+
+
+/* =========================================
+   CONTENIDO PRINCIPAL
+========================================= */
+
+.contenido-principal {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+
+/* =========================================
+   BARRA SUPERIOR
+========================================= */
+
+.barra-superior {
+    min-height: 85px;
+    padding: 16px 28px;
+    background: #e3eaf4;
+    border-bottom: 1px solid #d7e0ed;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.encabezado-pagina h1 {
+    font-size: 21px;
+    font-weight: 750;
+    color: #111c32;
+    letter-spacing: -0.5px;
+}
+
+.encabezado-pagina p {
+    font-size: 12px;
+    color: #75859e;
+    margin-top: 5px;
+}
+
+.acciones-superiores {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+
+/* BUSCADOR */
+
+.buscador-general {
+    width: 230px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 0 12px;
+    background: #edf2f9;
+    border: 1px solid #d4deeb;
+    border-radius: 12px;
+    box-shadow: inset 2px 2px 5px rgba(110, 130, 160, 0.12),
+                2px 2px 5px rgba(255, 255, 255, 0.7);
+}
+
+.buscador-general span {
+    color: #8799b2;
+    font-size: 20px;
+}
+
+.buscador-general input {
+    width: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: #24334b;
+    font-size: 11px;
+}
+
+.buscador-general input::placeholder {
+    color: #8998ad;
+}
+
+
+/* =========================================
+   CONTENIDO DE LAS VISTAS
+========================================= */
+
+.contenido-vista {
+    flex: 1;
+    padding: 26px;
+    min-width: 0;
+    background: #e8eef7;
+}
+
+
+/* =========================================
+   SCROLL PERSONALIZADO
+========================================= */
+
+.navegacion::-webkit-scrollbar {
+    width: 5px;
+}
+
+.navegacion::-webkit-scrollbar-thumb {
+    background: #344563;
+    border-radius: 10px;
+}
+
+
+/* =========================================
+   DISEÑO RESPONSIVE
+========================================= */
+
+@media (max-width: 900px) {
+
+    .menu-lateral {
+        width: 215px;
+        min-width: 215px;
+    }
+
+    .barra-superior {
+        padding: 15px 18px;
+    }
+
+    .contenido-vista {
+        padding: 18px;
+    }
+
+    .buscador-general {
+        width: 180px;
+    }
+
+}
+
+@media (max-width: 650px) {
+
+    .menu-lateral {
+        width: 65px;
+        min-width: 65px;
+    }
+
+    .marca-aulasyn {
+        justify-content: center;
+        padding: 0;
+    }
+
+    .marca-aulasyn img {
+        width: 36px;
+    }
+
+    .marca-aulasyn span,
+    .titulo-menu,
+    .opcion-menu span:not(.icono-menu),
+    .datos-usuario,
+    .boton-cerrar-sesion {
+        display: none;
+    }
+
+    .opcion-menu {
+        justify-content: center;
+        padding: 12px 5px;
+    }
+
+    .icono-menu {
+        font-size: 20px;
+    }
+
+    .usuario-menu {
+        justify-content: center;
+        padding: 10px 5px;
+    }
+
+    .barra-superior {
+        padding: 12px;
+    }
+
+    .encabezado-pagina h1 {
+        font-size: 16px;
+    }
+
+    .encabezado-pagina p {
+        font-size: 10px;
+    }
+
+    .buscador-general {
+        display: none;
+    }
+
+}
