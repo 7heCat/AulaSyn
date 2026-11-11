@@ -1,0 +1,629 @@
+
+{% extends "base.html" %}
+
+{% block titulo %}Gestión de Docentes | AulaSyn{% endblock %}
+
+{% block encabezado %}
+Gestión de Docentes
+{% endblock %}
+
+{% block estilos %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/docentes.css') }}">
+{% endblock %}
+
+
+{% block contenido %}
+
+<div class="docentes-contenedor">
+
+    <div class="encabezado-modulo">
+        <div>
+            <span class="etiqueta-modulo">MÓDULOS ACADÉMICOS</span>
+            <h1>Gestión de Docentes</h1>
+            <p>Administra la disponibilidad y las asignaturas de los docentes.</p>
+        </div>
+    </div>
+
+    <!-- PESTAÑAS -->
+    <div class="pestanas-docentes">
+
+        <button class="pestana-docente activa"
+                type="button"
+                data-pestana="disponibilidad">
+            Disponibilidad docente
+        </button>
+
+        <button class="pestana-docente"
+                type="button"
+                data-pestana="asignaturas">
+            Docente y asignaturas
+        </button>
+
+    </div>
+
+
+    <!-- =====================================
+         HU5: DISPONIBILIDAD DOCENTE
+    ====================================== -->
+
+    <section id="contenido-disponibilidad"
+             class="contenido-pestana activa">
+
+        <div class="encabezado-seccion">
+
+            <div>
+                <h2>Disponibilidad docente</h2>
+                <p>
+                    Registra los días, sedes y franjas horarias
+                    disponibles de cada docente.
+                </p>
+            </div>
+
+            <button type="button"
+                    class="boton-principal"
+                    id="abrir-modal-disponibilidad">
+                <span>+</span> Registrar disponibilidad
+            </button>
+
+        </div>
+
+
+        <!-- FILTROS -->
+        <div class="panel-filtros">
+
+            <div class="campo-filtro">
+                <label for="buscar-docente">Buscar docente</label>
+
+                <input type="text"
+                       id="buscar-docente"
+                       placeholder="Nombre del docente">
+            </div>
+
+            <div class="campo-filtro">
+                <label for="filtro-sede">Sede</label>
+
+                <select id="filtro-sede">
+                    <option value="">Todas las sedes</option>
+                </select>
+            </div>
+
+            <div class="campo-filtro">
+                <label for="filtro-dia">Día</label>
+
+                <select id="filtro-dia">
+                    <option value="">Todos los días</option>
+                    <option value="Lunes">Lunes</option>
+                    <option value="Martes">Martes</option>
+                    <option value="Miércoles">Miércoles</option>
+                    <option value="Jueves">Jueves</option>
+                    <option value="Viernes">Viernes</option>
+                    <option value="Sábado">Sábado</option>
+                </select>
+            </div>
+
+        </div>
+
+
+        <!-- TABLA DE DISPONIBILIDADES -->
+        <div class="tabla-contenedor">
+
+            <table class="tabla-docentes">
+
+                <thead>
+                    <tr>
+                        <th>Docente</th>
+                        <th>Día</th>
+                        <th>Sede</th>
+                        <th>Franja horaria</th>
+                        <th>Asignatura</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+
+                <tbody id="tabla-disponibilidad">
+                    <tr>
+                        <td colspan="7" class="mensaje-tabla">
+                            Cargando disponibilidades...
+                        </td>
+                    </tr>
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================
+         HU6: DOCENTE Y ASIGNATURAS
+    ====================================== -->
+
+    <section id="contenido-asignaturas"
+             class="contenido-pestana">
+
+        <div class="encabezado-seccion">
+
+            <div>
+                <h2>Docente y asignaturas</h2>
+                <p>
+                    Consulta y administra la información
+                    y las asignaturas de cada docente.
+                </p>
+            </div>
+
+            <button type="button"
+                    class="boton-principal"
+                    id="abrir-modal-asignatura">
+                <span>+</span> Asociar asignatura
+            </button>
+
+        </div>
+
+
+        <!-- BUSCADOR DE DOCENTES -->
+        <div class="panel-filtros">
+
+            <div class="campo-filtro">
+                <label for="buscar-docente-hu6">
+                    Buscar docente
+                </label>
+
+                <input type="text"
+                       id="buscar-docente-hu6"
+                       placeholder="Nombre o correo del docente">
+            </div>
+
+        </div>
+
+
+        <!-- TABLA DE DOCENTES -->
+        <div class="tabla-contenedor">
+
+            <table class="tabla-docentes">
+
+                <thead>
+                    <tr>
+                        <th>Docente</th>
+                        <th>Correo institucional</th>
+                        <th>Documento</th>
+                        <th>Asignaturas asociadas</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+
+                <tbody id="tabla-docentes-hu6">
+
+                    <tr>
+                        <td colspan="6" class="mensaje-tabla">
+                            Cargando docentes...
+                        </td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- ASIGNATURAS ASOCIADAS -->
+        <div class="encabezado-seccion encabezado-asociaciones">
+
+            <div>
+                <h2>Asignaturas asociadas</h2>
+                <p>
+                    Consulta las materias que puede impartir cada docente.
+                </p>
+            </div>
+
+        </div>
+
+
+        <div class="tabla-contenedor">
+
+            <table class="tabla-docentes">
+
+                <thead>
+                    <tr>
+                        <th>Docente</th>
+                        <th>Asignatura</th>
+                        <th>Semestre</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+
+                <tbody id="tabla-docente-asignaturas">
+
+                    <tr>
+                        <td colspan="4" class="mensaje-tabla">
+                            Cargando asignaturas asociadas...
+                        </td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+</div>
+
+
+<!-- =====================================
+     MODAL: REGISTRAR DISPONIBILIDAD
+====================================== -->
+
+<div class="modal-fondo"
+     id="modal-disponibilidad"
+     aria-hidden="true">
+
+    <div class="modal-aulasyn modal-formulario">
+
+        <div class="modal-cabecera">
+
+            <div class="modal-icono">
+                <span>+</span>
+            </div>
+
+            <div>
+                <h2 class="modal-titulo">
+                    Registrar disponibilidad
+                </h2>
+
+                <p>Completa la información del docente.</p>
+            </div>
+
+            <button type="button"
+                    class="modal-cerrar"
+                    id="cerrar-modal-disponibilidad"
+                    aria-label="Cerrar">
+                &times;
+            </button>
+
+        </div>
+
+
+        <form id="form-disponibilidad">
+
+            <div class="campo-formulario">
+
+                <label for="disponibilidad-docente">
+                    Docente
+                </label>
+
+                <select id="disponibilidad-docente" required>
+                    <option value="">Selecciona un docente</option>
+                </select>
+
+            </div>
+
+
+            <div class="campo-formulario">
+
+                <label for="disponibilidad-dia">
+                    Día de la semana
+                </label>
+
+                <select id="disponibilidad-dia" required>
+                    <option value="">Selecciona un día</option>
+                    <option value="Lunes">Lunes</option>
+                    <option value="Martes">Martes</option>
+                    <option value="Miércoles">Miércoles</option>
+                    <option value="Jueves">Jueves</option>
+                    <option value="Viernes">Viernes</option>
+                    <option value="Sábado">Sábado</option>
+                </select>
+
+            </div>
+
+
+            <div class="campo-formulario">
+
+                <label for="disponibilidad-sede">
+                    Sede
+                </label>
+
+                <select id="disponibilidad-sede" required>
+                    <option value="">Selecciona una sede</option>
+                </select>
+
+            </div>
+
+
+            <div class="campo-formulario">
+
+                <label for="disponibilidad-franja">
+                    Franja horaria
+                </label>
+
+                <select id="disponibilidad-franja" required>
+                    <option value="">Selecciona una franja</option>
+                </select>
+
+            </div>
+
+
+            <div class="campo-formulario">
+
+                <label for="disponibilidad-asignatura">
+                    Asignatura
+                </label>
+
+                <select id="disponibilidad-asignatura">
+                    <option value="">Sin asignatura específica</option>
+                </select>
+
+                <small>Este campo es opcional.</small>
+
+            </div>
+
+
+            <div class="modal-acciones">
+
+                <button type="button"
+                        class="modal-boton secundario"
+                        id="cancelar-disponibilidad">
+                    Cancelar
+                </button>
+
+                <button type="submit"
+                        class="modal-boton principal"
+                        id="guardar-disponibilidad">
+                    Guardar disponibilidad
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================
+     HU6: MODAL EDITAR INFORMACIÓN DOCENTE
+====================================== -->
+
+<div class="modal-fondo"
+     id="modal-editar-docente"
+     aria-hidden="true">
+
+    <div class="modal-aulasyn modal-formulario">
+
+        <div class="modal-cabecera">
+
+            <div class="modal-icono">
+                <span>✎</span>
+            </div>
+
+            <div>
+                <h2 class="modal-titulo">
+                    Editar información del docente
+                </h2>
+
+                <p>Actualiza los datos personales del docente.</p>
+            </div>
+
+            <button type="button"
+                    class="modal-cerrar"
+                    id="cerrar-modal-editar-docente"
+                    aria-label="Cerrar">
+                &times;
+            </button>
+
+        </div>
+
+
+        <form id="form-editar-docente">
+
+            <input type="hidden" id="editar-id-docente">
+
+            <div class="campo-formulario">
+
+                <label for="editar-nombres">
+                    Nombres
+                </label>
+
+                <input type="text"
+                       id="editar-nombres"
+                       maxlength="100"
+                       required>
+
+            </div>
+
+
+            <div class="campo-formulario">
+
+                <label for="editar-apellidos">
+                    Apellidos
+                </label>
+
+                <input type="text"
+                       id="editar-apellidos"
+                       maxlength="100"
+                       required>
+
+            </div>
+
+
+            <div class="campo-formulario">
+
+                <label for="editar-correo">
+                    Correo institucional
+                </label>
+
+                <input type="email"
+                       id="editar-correo"
+                       maxlength="150"
+                       required>
+
+            </div>
+
+
+            <div class="campo-formulario">
+
+                <label for="editar-documento">
+                    Documento
+                </label>
+
+                <input type="text"
+                       id="editar-documento"
+                       maxlength="30"
+                       required>
+
+            </div>
+
+
+            <div class="modal-acciones">
+
+                <button type="button"
+                        class="modal-boton secundario"
+                        id="cancelar-editar-docente">
+                    Cancelar
+                </button>
+
+                <button type="submit"
+                        class="modal-boton principal"
+                        id="guardar-editar-docente">
+                    Guardar cambios
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================
+     HU6: MODAL ASOCIAR ASIGNATURA
+====================================== -->
+
+<div class="modal-fondo"
+     id="modal-asignatura"
+     aria-hidden="true">
+
+    <div class="modal-aulasyn modal-formulario">
+
+        <div class="modal-cabecera">
+
+            <div class="modal-icono">
+                <span>+</span>
+            </div>
+
+            <div>
+                <h2 class="modal-titulo">
+                    Asociar asignatura
+                </h2>
+
+                <p>Selecciona el docente y la asignatura.</p>
+            </div>
+
+            <button type="button"
+                    class="modal-cerrar"
+                    id="cerrar-modal-asignatura"
+                    aria-label="Cerrar">
+                &times;
+            </button>
+
+        </div>
+
+
+        <form id="form-asociar-asignatura">
+
+            <div class="campo-formulario">
+
+                <label for="asignatura-docente">
+                    Docente
+                </label>
+
+                <select id="asignatura-docente" required>
+                    <option value="">Selecciona un docente</option>
+                </select>
+
+            </div>
+
+
+            <div class="campo-formulario">
+
+                <label for="asignatura-semestre">
+                    Semestre
+                </label>
+
+                <select id="asignatura-semestre" required>
+
+                    <option value="">
+                        Selecciona un semestre
+                    </option>
+
+                    <option value="1">Primer semestre</option>
+                    <option value="2">Segundo semestre</option>
+                    <option value="3">Tercer semestre</option>
+                    <option value="4">Cuarto semestre</option>
+                    <option value="5">Quinto semestre</option>
+                    <option value="6">Sexto semestre</option>
+                    <option value="7">Séptimo semestre</option>
+                    <option value="8">Octavo semestre</option>
+                    <option value="9">Noveno semestre</option>
+                    <option value="10">Décimo semestre</option>
+
+                </select>
+
+            </div>
+
+
+            <div class="campo-formulario">
+
+                <label for="asignatura-materia">
+                    Asignatura
+                </label>
+
+                <select id="asignatura-materia" required>
+                    <option value="">
+                        Selecciona una asignatura
+                    </option>
+                </select>
+
+                <small>
+                    Puedes asociar varias asignaturas al mismo docente.
+                </small>
+
+            </div>
+
+
+            <div class="modal-acciones">
+
+                <button type="button"
+                        class="modal-boton secundario"
+                        id="cancelar-asignatura">
+                    Cancelar
+                </button>
+
+                <button type="submit"
+                        class="modal-boton principal"
+                        id="guardar-asignatura">
+                    Asociar asignatura
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/docentes.js') }}"></script>
+{% endblock %}

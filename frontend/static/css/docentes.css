@@ -1,0 +1,666 @@
+
+/* =====================================================
+   CONTENEDOR PRINCIPAL
+===================================================== */
+
+.docentes-contenedor {
+    width: 100%;
+    padding: 10px 4px 30px;
+    color: #1e293b;
+}
+
+.encabezado-modulo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 28px;
+}
+
+.etiqueta-modulo {
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+}
+
+.encabezado-modulo h1 {
+    margin: 7px 0;
+    color: #172554;
+    font-size: 27px;
+    font-weight: 750;
+}
+
+.encabezado-modulo p,
+.encabezado-seccion p {
+    margin: 0;
+    color: #64748b;
+    font-size: 14px;
+}
+
+
+/* =====================================================
+   PESTAÑAS
+===================================================== */
+
+.pestanas-docentes {
+    display: flex;
+    gap: 8px;
+    border-bottom: 1px solid #e2e8f0;
+    margin-bottom: 25px;
+}
+
+.pestana-docente {
+    position: relative;
+    border: none;
+    background: transparent;
+    color: #64748b;
+    padding: 13px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.pestana-docente:hover {
+    color: #2563eb;
+}
+
+.pestana-docente.activa {
+    color: #2563eb;
+}
+
+.pestana-docente.activa::after {
+    content: "";
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    bottom: -1px;
+    height: 3px;
+    border-radius: 5px 5px 0 0;
+    background: #2563eb;
+}
+
+.contenido-pestana {
+    display: none;
+}
+
+.contenido-pestana.activa {
+    display: block;
+}
+
+
+/* =====================================================
+   ENCABEZADO DE SECCIÓN
+===================================================== */
+
+.encabezado-seccion {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 22px;
+}
+
+.encabezado-seccion h2 {
+    margin: 0 0 7px;
+    color: #172554;
+    font-size: 19px;
+    font-weight: 700;
+}
+
+.encabezado-asociaciones {
+    margin-top: 28px;
+}
+
+.boton-principal {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: none;
+    border-radius: 9px;
+    padding: 11px 16px;
+    background: #2563eb;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+    white-space: nowrap;
+}
+
+.boton-principal:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+}
+
+.boton-principal span {
+    font-size: 19px;
+    line-height: 14px;
+}
+
+
+/* =====================================================
+   FILTROS Y BUSCADORES
+===================================================== */
+
+.panel-filtros {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr;
+    gap: 15px;
+    padding: 18px;
+    margin-bottom: 20px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: #ffffff;
+}
+
+.campo-filtro,
+.campo-formulario {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.campo-filtro label,
+.campo-formulario label {
+    color: #334155;
+    font-size: 12px;
+    font-weight: 650;
+}
+
+.campo-filtro input,
+.campo-filtro select,
+.campo-formulario input,
+.campo-formulario select {
+    width: 100%;
+    min-height: 42px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    outline: none;
+    padding: 9px 11px;
+    background: #ffffff;
+    color: #334155;
+    font-size: 13px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.campo-filtro input:focus,
+.campo-filtro select:focus,
+.campo-formulario input:focus,
+.campo-formulario select:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+}
+
+.campo-formulario small {
+    color: #94a3b8;
+    font-size: 11px;
+}
+
+
+/* =====================================================
+   TABLAS
+===================================================== */
+
+.tabla-contenedor {
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: #ffffff;
+}
+
+.tabla-docentes {
+    width: 100%;
+    min-width: 850px;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.tabla-docentes thead {
+    background: #f8fafc;
+}
+
+.tabla-docentes th {
+    padding: 15px 14px;
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
+}
+
+.tabla-docentes td {
+    padding: 14px;
+    border-top: 1px solid #f1f5f9;
+    color: #334155;
+    font-size: 13px;
+    vertical-align: middle;
+}
+
+.tabla-docentes tbody tr:hover {
+    background: #f8fafc;
+}
+
+.mensaje-tabla {
+    padding: 30px !important;
+    color: #94a3b8 !important;
+    text-align: center;
+}
+
+
+/* =====================================================
+   ESTADOS DE DISPONIBILIDAD Y DOCENTES
+===================================================== */
+
+.estado-disponibilidad {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border-radius: 20px;
+    padding: 6px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.estado-disponibilidad::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+}
+
+.estado-disponibilidad.activa {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.estado-disponibilidad.activa::before {
+    background: #16a34a;
+}
+
+.estado-disponibilidad.inactiva {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.estado-disponibilidad.inactiva::before {
+    background: #dc2626;
+}
+
+.detalle-horario {
+    display: block;
+    margin-top: 4px;
+    color: #94a3b8;
+    font-size: 11px;
+}
+
+.boton-estado {
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    padding: 7px 10px;
+    background: #ffffff;
+    color: #475569;
+    font-size: 11px;
+    font-weight: 650;
+    cursor: pointer;
+    transition: 0.2s;
+    white-space: nowrap;
+}
+
+.boton-estado:hover {
+    border-color: #2563eb;
+    color: #2563eb;
+    background: #eff6ff;
+}
+
+.boton-estado:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+
+/* =====================================================
+   HU6: INFORMACIÓN DEL DOCENTE
+===================================================== */
+
+.encabezado-asociaciones {
+    padding-top: 5px;
+}
+
+.docente-nombre {
+    color: #172554;
+    font-weight: 700;
+}
+
+.docente-correo {
+    color: #64748b;
+    font-size: 12px;
+}
+
+.cantidad-asignaturas {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    height: 25px;
+    padding: 0 8px;
+    border-radius: 20px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.estado-docente {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 20px;
+    padding: 6px 10px;
+    background: #dcfce7;
+    color: #166534;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.estado-docente::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    margin-right: 6px;
+    border-radius: 50%;
+    background: #16a34a;
+}
+
+
+/* =====================================================
+   HU6: BOTONES DE ACCIONES
+===================================================== */
+
+.acciones-docente {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    flex-wrap: wrap;
+}
+
+.boton-editar,
+.boton-eliminar,
+.boton-asociar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    padding: 7px 10px;
+    background: #ffffff;
+    color: #475569;
+    font-size: 11px;
+    font-weight: 650;
+    cursor: pointer;
+    transition: 0.2s;
+    white-space: nowrap;
+}
+
+.boton-editar:hover,
+.boton-asociar:hover {
+    border-color: #2563eb;
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+.boton-eliminar:hover {
+    border-color: #ef4444;
+    background: #fef2f2;
+    color: #dc2626;
+}
+
+.boton-editar:disabled,
+.boton-eliminar:disabled,
+.boton-asociar:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+
+/* =====================================================
+   HU6: ASIGNATURAS ASOCIADAS
+===================================================== */
+
+.asignatura-nombre {
+    color: #1e293b;
+    font-weight: 600;
+}
+
+.asignatura-semestre {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 7px;
+    padding: 5px 9px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    font-size: 11px;
+    font-weight: 650;
+}
+
+
+/* =====================================================
+   MODAL DE FORMULARIO
+===================================================== */
+
+.modal-fondo {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(15, 23, 42, 0.58);
+    backdrop-filter: blur(3px);
+}
+
+.modal-fondo.visible {
+    display: flex;
+}
+
+.modal-aulasyn.modal-formulario {
+    width: 100%;
+    max-width: 510px;
+    max-height: 90vh;
+    overflow-y: auto;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 25px;
+    background: #ffffff;
+    box-shadow: 0 20px 60px rgba(15, 23, 42, 0.22);
+    animation: aparecerModal 0.2s ease-out;
+}
+
+@keyframes aparecerModal {
+    from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.modal-cabecera {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 23px;
+}
+
+.modal-icono {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 42px;
+    height: 42px;
+    border-radius: 11px;
+    background: #dbeafe;
+    color: #2563eb;
+    font-size: 25px;
+}
+
+.modal-cabecera > div:nth-child(2) {
+    flex: 1;
+}
+
+.modal-titulo {
+    margin: 0 0 5px;
+    color: #172554;
+    font-size: 18px;
+    font-weight: 750;
+}
+
+.modal-cabecera p {
+    margin: 0;
+    color: #64748b;
+    font-size: 12px;
+}
+
+.modal-cerrar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: #64748b;
+    font-size: 25px;
+    cursor: pointer;
+}
+
+.modal-cerrar:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+}
+
+
+/* =====================================================
+   FORMULARIOS HU5 Y HU6
+===================================================== */
+
+#form-disponibilidad,
+#form-editar-docente,
+#form-asociar-asignatura {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.modal-acciones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 8px;
+    padding-top: 18px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.modal-boton {
+    border: none;
+    border-radius: 8px;
+    padding: 10px 15px;
+    font-size: 12px;
+    font-weight: 650;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.modal-boton.secundario {
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    color: #475569;
+}
+
+.modal-boton.secundario:hover {
+    background: #f8fafc;
+}
+
+.modal-boton.principal {
+    background: #2563eb;
+    color: #ffffff;
+}
+
+.modal-boton.principal:hover {
+    background: #1d4ed8;
+}
+
+.modal-boton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 850px) {
+
+    .panel-filtros {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .campo-filtro:first-child {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 600px) {
+
+    .encabezado-seccion {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .panel-filtros {
+        grid-template-columns: 1fr;
+    }
+
+    .campo-filtro:first-child {
+        grid-column: auto;
+    }
+
+    .pestanas-docentes {
+        overflow-x: auto;
+    }
+
+    .pestana-docente {
+        padding: 12px;
+        white-space: nowrap;
+    }
+
+    .modal-aulasyn.modal-formulario {
+        padding: 19px;
+    }
+
+    .modal-acciones {
+        flex-direction: column-reverse;
+    }
+
+    .modal-boton {
+        width: 100%;
+        min-height: 40px;
+    }
+
+    .acciones-docente {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
