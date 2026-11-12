@@ -1,0 +1,254 @@
+{% extends "base.html" %}
+
+{% block titulo %}Carga Académica | AulaSyn{% endblock %}
+
+{% block encabezado %}
+Carga Académica
+{% endblock %}
+
+{% block estilos %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/docentes.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/carga_academica.css') }}">
+{% endblock %}
+
+
+{% block contenido %}
+
+<div class="docentes-contenedor">
+
+    <div class="encabezado-modulo">
+        <div>
+            <span class="etiqueta-modulo">MÓDULO DOCENTES</span>
+            <h1>Carga académica</h1>
+            <p>Consulta las materias y los grupos asignados a cada docente.</p>
+        </div>
+
+        <div class="acciones-encabezado">
+            <button type="button" class="boton-estado" id="abrir-modal-grupo">
+                + Crear grupo
+            </button>
+            <button type="button" class="boton-principal" id="abrir-modal-clase">
+                <span>+</span> Asignar clase
+            </button>
+        </div>
+    </div>
+
+
+    <!-- FILTROS -->
+    <div class="panel-filtros">
+
+        <div class="campo-filtro">
+            <label for="buscar-carga">Buscar docente</label>
+            <input type="text" id="buscar-carga" placeholder="Nombre o correo del docente">
+        </div>
+
+        <div class="campo-filtro">
+            <label for="filtro-periodo">Periodo</label>
+            <select id="filtro-periodo">
+                <option value="">Todos los periodos</option>
+            </select>
+        </div>
+
+    </div>
+
+
+    <!-- RESUMEN POR DOCENTE -->
+    <div class="tabla-contenedor">
+        <table class="tabla-docentes">
+            <thead>
+                <tr>
+                    <th>Docente</th>
+                    <th>Asignaturas</th>
+                    <th>Grupos</th>
+                    <th>Clases por semana</th>
+                    <th>Horas por semana</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="tabla-carga">
+                <tr><td colspan="6" class="mensaje-tabla">Cargando carga académica...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+
+    <!-- GRUPOS DEL PERIODO -->
+    <section class="detalle-carga">
+        <div class="encabezado-seccion">
+            <div>
+                <h2>Grupos</h2>
+                <p>Grupos creados. Para dictarlos, usa "Asignar clase".</p>
+            </div>
+        </div>
+        <div class="tabla-contenedor">
+            <table class="tabla-docentes">
+                <thead>
+                    <tr>
+                        <th>Periodo</th>
+                        <th>Grupo</th>
+                        <th>Asignatura</th>
+                        <th>Semestre</th>
+                        <th>Clases asignadas</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla-grupos">
+                    <tr><td colspan="5" class="mensaje-tabla">Cargando grupos...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+
+    <!-- DETALLE DEL DOCENTE SELECCIONADO -->
+    <section id="detalle-carga" class="detalle-carga" hidden>
+
+        <div class="encabezado-seccion">
+            <div>
+                <h2 id="detalle-titulo">Detalle</h2>
+                <p id="detalle-subtitulo"></p>
+            </div>
+            <button type="button" class="boton-estado" id="cerrar-detalle">Cerrar detalle</button>
+        </div>
+
+        <div class="tabla-contenedor">
+            <table class="tabla-docentes">
+                <thead>
+                    <tr>
+                        <th>Asignatura</th>
+                        <th>Grupo</th>
+                        <th>Periodo</th>
+                        <th>Día</th>
+                        <th>Horario</th>
+                        <th>Sede</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla-detalle"></tbody>
+            </table>
+        </div>
+
+    </section>
+
+</div>
+
+
+<!-- =====================================
+     MODAL: CREAR GRUPO
+====================================== -->
+<div class="modal-fondo" id="modal-grupo" aria-hidden="true">
+    <div class="modal-aulasyn modal-formulario">
+
+        <div class="modal-cabecera">
+            <div class="modal-icono"><span>+</span></div>
+            <div>
+                <h2 class="modal-titulo">Crear grupo</h2>
+                <p>Un grupo es una asignatura abierta en un periodo.</p>
+            </div>
+            <button type="button" class="modal-cerrar" id="cerrar-modal-grupo" aria-label="Cerrar">&times;</button>
+        </div>
+
+        <form id="form-grupo">
+
+            <div class="campo-formulario">
+                <label for="grupo-periodo">Periodo</label>
+                <input type="text" id="grupo-periodo" maxlength="5" inputmode="numeric"
+                       placeholder="Ej. 22026" required>
+            </div>
+
+            <div class="campo-formulario">
+                <label for="grupo-codigo">Código del grupo</label>
+                <input type="text" id="grupo-codigo" maxlength="20" placeholder="Ej. 941A" required>
+            </div>
+
+            <div class="campo-formulario">
+                <label for="grupo-asignatura">Asignatura</label>
+                <select id="grupo-asignatura" required>
+                    <option value="">Selecciona una asignatura</option>
+                </select>
+            </div>
+
+            <div class="campo-formulario">
+                <label for="grupo-codigo-asignatura">Código de la asignatura</label>
+                <input type="text" id="grupo-codigo-asignatura" maxlength="20" placeholder="Ej. FI303273">
+                <small>Este campo es opcional.</small>
+            </div>
+
+            <div class="modal-acciones">
+                <button type="button" class="modal-boton secundario" id="cancelar-grupo">Cancelar</button>
+                <button type="submit" class="modal-boton principal" id="guardar-grupo">Crear grupo</button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+
+<!-- =====================================
+     MODAL: ASIGNAR CLASE (HU8)
+====================================== -->
+<div class="modal-fondo" id="modal-clase" aria-hidden="true">
+    <div class="modal-aulasyn modal-formulario">
+
+        <div class="modal-cabecera">
+            <div class="modal-icono"><span>+</span></div>
+            <div>
+                <h2 class="modal-titulo">Asignar clase</h2>
+                <p>Se valida la disponibilidad del docente al elegir el horario.</p>
+            </div>
+            <button type="button" class="modal-cerrar" id="cerrar-modal-clase" aria-label="Cerrar">&times;</button>
+        </div>
+
+        <form id="form-clase">
+
+            <div class="campo-formulario">
+                <label for="clase-docente">Docente</label>
+                <select id="clase-docente" required>
+                    <option value="">Selecciona un docente</option>
+                </select>
+            </div>
+
+            <div class="campo-formulario">
+                <label for="clase-grupo">Grupo</label>
+                <select id="clase-grupo" required>
+                    <option value="">Selecciona un grupo</option>
+                </select>
+            </div>
+
+            <div class="campo-formulario">
+                <label for="clase-dia">Día de la semana</label>
+                <select id="clase-dia" required>
+                    <option value="">Selecciona un día</option>
+                </select>
+            </div>
+
+            <div class="campo-formulario">
+                <label for="clase-sede">Sede</label>
+                <select id="clase-sede" required>
+                    <option value="">Selecciona una sede</option>
+                </select>
+            </div>
+
+            <div class="campo-formulario">
+                <label for="clase-franja">Franja horaria</label>
+                <select id="clase-franja" required>
+                    <option value="">Selecciona una franja</option>
+                </select>
+            </div>
+
+            <p class="resultado-validacion" id="resultado-validacion" role="status" hidden></p>
+
+            <div class="modal-acciones">
+                <button type="button" class="modal-boton secundario" id="cancelar-clase">Cancelar</button>
+                <button type="submit" class="modal-boton principal" id="guardar-clase">Asignar clase</button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/carga_academica.js') }}"></script>
+{% endblock %}

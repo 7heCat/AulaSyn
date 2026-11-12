@@ -1,0 +1,76 @@
+/* HU7 / HU8 · Carga académica (reutiliza los estilos de docentes.css) */
+
+.acciones-encabezado {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.detalle-carga {
+    margin-top: 28px;
+}
+
+.detalle-carga[hidden] {
+    display: none !important;
+}
+
+.cifra-carga {
+    font-weight: 700;
+    color: #1e3a5f;
+}
+
+.resultado-validacion {
+    margin: 4px 0 14px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.resultado-validacion[hidden] {
+    display: none !important;
+}
+
+.resultado-validacion.valido {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.resultado-validacion.invalido {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.resultado-validacion.aviso {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.resultado-validacion .linea-aviso {
+    display: block;
+    margin-top: 4px;
+}
+
+.campo-formulario input {
+    width: 100%;
+}
+
+#tabla-carga .docente-nombre,
+#tabla-carga .docente-correo,
+#tabla-detalle .docente-nombre,
+#tabla-detalle .detalle-horario {
+    display: block;
+}
+
+#tabla-carga .docente-nombre,
+#tabla-detalle .docente-nombre {
+    font-weight: 700;
+    color: #1e3a5f;
+}
+
+#tabla-carga .docente-correo {
+    margin-top: 2px;
+    color: #94a3b8;
+    font-size: 11px;
+}

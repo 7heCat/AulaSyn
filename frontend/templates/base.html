@@ -56,6 +56,12 @@
                     <span class="icono-menu">♙</span>
                     <span>Gestión de Docentes</span>
                 </a>
+
+                <a href="{{ url_for('carga_academica.pagina_carga_academica') }}"
+                   class="opcion-menu {% if request.path == '/carga-academica' %}activa{% endif %}">
+                    <span class="icono-menu">▥</span>
+                    <span>Carga Académica</span>
+                </a>
                 {% endif %}
 
                 <a href="#" class="opcion-menu proximamente">

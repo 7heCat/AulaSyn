@@ -16,6 +16,7 @@ from config.database import obtener_conexion
 from werkzeug.security import generate_password_hash, check_password_hash
 from permisos import requiere_permiso
 from recuperacion import recuperacion_bp
+from carga_academica import carga_bp
 
 
 app = Flask(
@@ -25,6 +26,7 @@ app = Flask(
 )
 
 app.register_blueprint(recuperacion_bp)
+app.register_blueprint(carga_bp)
 
 
 # ======================================================
