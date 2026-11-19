@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block titulo %}Gestión de Grupos | AulaSyn{% endblock %}
+{% block encabezado %}Gestión de Grupos{% endblock %}
+{% block estilos %}<link rel="stylesheet" href="{{ url_for('static', filename='css/grupos.css') }}">{% endblock %}
+{% block contenido %}
+<section class="gr-contenedor">
+  <div class="gr-intro"><div><h2>Grupos académicos</h2><p>Crea y administra grupos a partir de las asignaturas de los programas académicos.</p></div><button class="gr-boton principal" id="gr-nuevo">+ Crear grupo</button></div>
+  <div class="gr-filtros"><input id="gr-buscar" type="search" placeholder="Buscar por programa, asignatura o código..."><input id="gr-periodo-filtro" type="text" maxlength="5" placeholder="Filtrar periodo (ej. 22026)"><select id="gr-estado-filtro"><option value="">Todos los estados</option><option value="true">Activos</option><option value="false">Inactivos</option></select></div>
+  <div class="gr-tabla-wrap"><table class="gr-tabla"><thead><tr><th>Periodo</th><th>Grupo</th><th>Programa</th><th>Asignatura</th><th>Semestre</th><th>Cupo máximo</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="gr-filas"><tr><td colspan="8">Cargando grupos...</td></tr></tbody></table></div>
+</section>
+<div class="gr-modal-fondo" id="gr-modal" aria-hidden="true"><form class="gr-modal" id="gr-form"><div class="gr-modal-cabecera"><h2 id="gr-modal-titulo">Crear grupo</h2><button type="button" id="gr-cerrar" aria-label="Cerrar">×</button></div><input type="hidden" id="gr-id"><label>Periodo académico (5 dígitos)<input id="gr-periodo" maxlength="5" placeholder="22026" required></label><label>Código del grupo<input id="gr-codigo" maxlength="20" placeholder="941A" required></label><label>Asignatura del programa<select id="gr-asignatura" required><option value="">Cargando asignaturas...</option></select></label><label>Código de la asignatura (opcional)<input id="gr-codigo-asignatura" maxlength="20" placeholder="FI303273"></label><label>Cupo máximo de estudiantes<input id="gr-cupo" type="number" min="1" max="500" value="30" required></label><div class="gr-modal-acciones"><button type="button" class="gr-boton secundario" id="gr-cancelar">Cancelar</button><button type="submit" class="gr-boton principal">Guardar grupo</button></div></form></div>
+<div class="gr-notificacion" id="gr-notificacion" role="status"></div>
+<script src="{{ url_for('static', filename='js/grupos.js') }}" defer></script>
+{% endblock %}

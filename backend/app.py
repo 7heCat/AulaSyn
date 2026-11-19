@@ -75,6 +75,486 @@ def gestion_docentes():
     return render_template("docentes.html")
 
 
+
+# ======================================================
+# HU12 · PROGRAMAS ACADÉMICOS Y PENSUM
+# ======================================================
+
+@app.route("/programas-academicos")
+@requiere_permiso("gestionar_docentes")
+def pagina_programas_academicos():
+    return render_template("programas_academicos.html")
+
+
+@app.route("/api/programas-academicos/programas", methods=["GET"])
+@requiere_permiso("gestionar_docentes")
+def listar_programas_academicos():
+    conexion = None
+    try:
+        conexion = obtener_conexion()
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT p.id_programa, p.nombre, p.descripcion, p.total_semestres,
+                       p.activa, p.fecha_creacion,
+                       COUNT(a.id_asignatura) AS total_asignaturas
+                FROM public.programas_academicos p
+                LEFT JOIN public.asignaturas a ON a.id_programa = p.id_programa
+                GROUP BY p.id_programa
+                ORDER BY p.nombre;
+            """)
+            filas = cursor.fetchall()
+        campos = ("id_programa", "nombre", "descripcion", "total_semestres",
+                  "activa", "fecha_creacion", "total_asignaturas")
+        return jsonify({"programas": [dict(zip(campos, fila)) for fila in filas]}), 200
+    except Exception:
+        app.logger.exception("Error al consultar programas académicos")
+        return jsonify({"mensaje": "No fue posible consultar los programas académicos."}), 500
+    finally:
+        if conexion is not None:
+            conexion.close()
+
+
+@app.route("/api/programas-academicos/programas", methods=["POST"])
+@requiere_permiso("gestionar_docentes")
+def crear_programa_academico():
+    d = request.get_json(silent=True) or {}
+    nombre = d.get("nombre", "").strip() if isinstance(d.get("nombre"), str) else ""
+    descripcion = d.get("descripcion", "").strip() if isinstance(d.get("descripcion"), str) else ""
+    total = d.get("total_semestres", 10)
+    if not nombre:
+        return jsonify({"mensaje": "El nombre del programa es obligatorio."}), 400
+    if not isinstance(total, int) or isinstance(total, bool) or not 1 <= total <= 20:
+        return jsonify({"mensaje": "La cantidad de semestres debe estar entre 1 y 20."}), 400
+    conexion = None
+    try:
+        conexion = obtener_conexion()
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                INSERT INTO public.programas_academicos
+                    (nombre, descripcion, total_semestres, activa)
+                VALUES (%s, %s, %s, TRUE)
+                RETURNING id_programa;
+            """, (nombre, descripcion or None, total))
+            nuevo_id = cursor.fetchone()[0]
+        conexion.commit()
+        return jsonify({"mensaje": "Programa académico creado correctamente.", "id_programa": nuevo_id}), 201
+    except Exception:
+        if conexion:
+            conexion.rollback()
+        app.logger.exception("Error al crear programa académico")
+        return jsonify({"mensaje": "No fue posible crear el programa. Verifica que no exista otro con el mismo nombre."}), 500
+    finally:
+        if conexion is not None:
+            conexion.close()
+
+
+@app.route("/api/programas-academicos/programas/<int:id_programa>", methods=["PUT"])
+@requiere_permiso("gestionar_docentes")
+def actualizar_programa_academico(id_programa):
+    d = request.get_json(silent=True) or {}
+    nombre = d.get("nombre", "").strip() if isinstance(d.get("nombre"), str) else ""
+    descripcion = d.get("descripcion", "").strip() if isinstance(d.get("descripcion"), str) else ""
+    total = d.get("total_semestres")
+    if not nombre:
+        return jsonify({"mensaje": "El nombre del programa es obligatorio."}), 400
+    if not isinstance(total, int) or isinstance(total, bool) or not 1 <= total <= 20:
+        return jsonify({"mensaje": "La cantidad de semestres debe estar entre 1 y 20."}), 400
+    conexion = None
+    try:
+        conexion = obtener_conexion()
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT COALESCE(MAX(semestre), 0)
+                FROM public.asignaturas WHERE id_programa = %s;
+            """, (id_programa,))
+            semestre_maximo = cursor.fetchone()[0]
+            if total < semestre_maximo:
+                return jsonify({"mensaje": f"No puedes reducir el programa a {total} semestres porque ya tiene asignaturas hasta el semestre {semestre_maximo}."}), 400
+            cursor.execute("""
+                UPDATE public.programas_academicos
+                SET nombre=%s, descripcion=%s, total_semestres=%s
+                WHERE id_programa=%s;
+            """, (nombre, descripcion or None, total, id_programa))
+            if cursor.rowcount == 0:
+                return jsonify({"mensaje": "El programa académico no existe."}), 404
+        conexion.commit()
+        return jsonify({"mensaje": "Programa académico actualizado correctamente."}), 200
+    except Exception:
+        if conexion:
+            conexion.rollback()
+        app.logger.exception("Error al actualizar programa académico")
+        return jsonify({"mensaje": "No fue posible actualizar el programa. Verifica que el nombre no esté repetido."}), 500
+    finally:
+        if conexion is not None:
+            conexion.close()
+
+
+@app.route("/api/programas-academicos/programas/<int:id_programa>/estado", methods=["PATCH"])
+@requiere_permiso("gestionar_docentes")
+def cambiar_estado_programa_academico(id_programa):
+    d = request.get_json(silent=True) or {}
+    activa = d.get("activa")
+    if not isinstance(activa, bool):
+        return jsonify({"mensaje": "El estado enviado no es válido."}), 400
+    conexion = None
+    try:
+        conexion = obtener_conexion()
+        with conexion.cursor() as cursor:
+            if not activa:
+                cursor.execute("SELECT COUNT(*) FROM public.grupos g JOIN public.asignaturas a ON a.id_asignatura=g.id_asignatura WHERE a.id_programa=%s AND g.activo=TRUE", (id_programa,))
+                if cursor.fetchone()[0] > 0:
+                    return jsonify({"mensaje": "No puedes desactivar este programa porque tiene grupos activos."}), 400
+            cursor.execute("UPDATE public.programas_academicos SET activa=%s WHERE id_programa=%s", (activa, id_programa))
+            if cursor.rowcount == 0:
+                return jsonify({"mensaje": "El programa académico no existe."}), 404
+        conexion.commit()
+        return jsonify({"mensaje": "Estado del programa actualizado correctamente."}), 200
+    except Exception:
+        if conexion:
+            conexion.rollback()
+        app.logger.exception("Error al cambiar estado del programa")
+        return jsonify({"mensaje": "No fue posible cambiar el estado del programa."}), 500
+    finally:
+        if conexion is not None:
+            conexion.close()
+
+
+@app.route("/api/programas-academicos/asignaturas", methods=["GET"])
+@requiere_permiso("gestionar_docentes")
+def listar_asignaturas_programa():
+    id_programa = request.args.get("id_programa", type=int)
+    if not id_programa:
+        return jsonify({"mensaje": "Selecciona un programa académico."}), 400
+    conexion = None
+    try:
+        conexion = obtener_conexion()
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT id_asignatura, id_programa, nombre, descripcion, activa,
+                       semestre, creditos, horas_por_clase, frecuencia
+                FROM public.asignaturas
+                WHERE id_programa=%s
+                ORDER BY semestre NULLS LAST, nombre;
+            """, (id_programa,))
+            filas = cursor.fetchall()
+        campos = ("id_asignatura", "id_programa", "nombre", "descripcion", "activa",
+                  "semestre", "creditos", "horas_por_clase", "frecuencia")
+        return jsonify({"asignaturas": [dict(zip(campos, fila)) for fila in filas]}), 200
+    except Exception:
+        app.logger.exception("Error al consultar asignaturas del programa")
+        return jsonify({"mensaje": "No fue posible consultar las asignaturas."}), 500
+    finally:
+        if conexion is not None:
+            conexion.close()
+
+
+@app.route("/api/programas-academicos/asignaturas", methods=["POST"])
+@requiere_permiso("gestionar_docentes")
+def crear_asignatura_programa():
+    d = request.get_json(silent=True) or {}
+    nombre = d.get("nombre", "").strip() if isinstance(d.get("nombre"), str) else ""
+    descripcion = d.get("descripcion", "").strip() if isinstance(d.get("descripcion"), str) else ""
+    id_programa = d.get("id_programa")
+    semestre, creditos, horas = d.get("semestre"), d.get("creditos"), d.get("horas_por_clase")
+    frecuencia = d.get("frecuencia", "")
+    if not nombre:
+        return jsonify({"mensaje": "El nombre de la asignatura es obligatorio."}), 400
+    if not isinstance(id_programa, int) or isinstance(id_programa, bool):
+        return jsonify({"mensaje": "Selecciona un programa académico."}), 400
+    if not isinstance(semestre, int) or isinstance(semestre, bool) or semestre < 1:
+        return jsonify({"mensaje": "Selecciona un semestre válido."}), 400
+    if not isinstance(creditos, int) or isinstance(creditos, bool) or not 1 <= creditos <= 4:
+        return jsonify({"mensaje": "Los créditos deben estar entre 1 y 4."}), 400
+    if not isinstance(horas, int) or isinstance(horas, bool) or not 1 <= horas <= 12:
+        return jsonify({"mensaje": "La intensidad debe estar entre 1 y 12 horas por clase."}), 400
+    if frecuencia not in ("semanal", "quincenal"):
+        return jsonify({"mensaje": "Selecciona una frecuencia válida."}), 400
+    conexion = None
+    try:
+        conexion = obtener_conexion()
+        with conexion.cursor() as cursor:
+            cursor.execute("SELECT total_semestres FROM public.programas_academicos WHERE id_programa=%s AND activa=TRUE", (id_programa,))
+            programa = cursor.fetchone()
+            if programa is None:
+                return jsonify({"mensaje": "El programa seleccionado no existe o está inactivo."}), 404
+            if semestre > programa[0]:
+                return jsonify({"mensaje": f"Este programa tiene {programa[0]} semestres. Selecciona uno dentro de ese rango."}), 400
+            cursor.execute("""
+                INSERT INTO public.asignaturas
+                    (id_programa, nombre, descripcion, semestre, creditos, horas_por_clase, frecuencia, activa)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, TRUE)
+                RETURNING id_asignatura;
+            """, (id_programa, nombre, descripcion or None, semestre, creditos, horas, frecuencia))
+            nuevo_id = cursor.fetchone()[0]
+        conexion.commit()
+        return jsonify({"mensaje": "Asignatura creada correctamente.", "id_asignatura": nuevo_id}), 201
+    except Exception:
+        if conexion:
+            conexion.rollback()
+        app.logger.exception("Error al crear asignatura")
+        return jsonify({"mensaje": "No fue posible crear la asignatura. Verifica los datos e intenta nuevamente."}), 500
+    finally:
+        if conexion is not None:
+            conexion.close()
+
+
+@app.route("/api/programas-academicos/asignaturas/<int:id_asignatura>", methods=["PUT"])
+@requiere_permiso("gestionar_docentes")
+def actualizar_asignatura_programa(id_asignatura):
+    d = request.get_json(silent=True) or {}
+    nombre = d.get("nombre", "").strip() if isinstance(d.get("nombre"), str) else ""
+    descripcion = d.get("descripcion", "").strip() if isinstance(d.get("descripcion"), str) else ""
+    id_programa = d.get("id_programa")
+    semestre, creditos, horas = d.get("semestre"), d.get("creditos"), d.get("horas_por_clase")
+    frecuencia = d.get("frecuencia", "")
+    if not nombre or not isinstance(id_programa, int) or isinstance(id_programa, bool):
+        return jsonify({"mensaje": "Completa el nombre y selecciona un programa."}), 400
+    if not isinstance(semestre, int) or isinstance(semestre, bool) or semestre < 1:
+        return jsonify({"mensaje": "Selecciona un semestre válido."}), 400
+    if not isinstance(creditos, int) or isinstance(creditos, bool) or not 1 <= creditos <= 4:
+        return jsonify({"mensaje": "Los créditos deben estar entre 1 y 4."}), 400
+    if not isinstance(horas, int) or isinstance(horas, bool) or not 1 <= horas <= 12 or frecuencia not in ("semanal", "quincenal"):
+        return jsonify({"mensaje": "Revisa la intensidad y la frecuencia."}), 400
+    conexion = None
+    try:
+        conexion = obtener_conexion()
+        with conexion.cursor() as cursor:
+            cursor.execute("SELECT total_semestres FROM public.programas_academicos WHERE id_programa=%s AND activa=TRUE", (id_programa,))
+            programa = cursor.fetchone()
+            if programa is None:
+                return jsonify({"mensaje": "El programa seleccionado no existe o está inactivo."}), 404
+            if semestre > programa[0]:
+                return jsonify({"mensaje": f"Este programa tiene {programa[0]} semestres."}), 400
+            cursor.execute("""
+                UPDATE public.asignaturas
+                SET id_programa=%s, nombre=%s, descripcion=%s, semestre=%s,
+                    creditos=%s, horas_por_clase=%s, frecuencia=%s
+                WHERE id_asignatura=%s;
+            """, (id_programa, nombre, descripcion or None, semestre, creditos, horas, frecuencia, id_asignatura))
+            if cursor.rowcount == 0:
+                return jsonify({"mensaje": "La asignatura no existe."}), 404
+        conexion.commit()
+        return jsonify({"mensaje": "Asignatura actualizada correctamente."}), 200
+    except Exception:
+        if conexion:
+            conexion.rollback()
+        app.logger.exception("Error al actualizar asignatura")
+        return jsonify({"mensaje": "No fue posible actualizar la asignatura."}), 500
+    finally:
+        if conexion is not None:
+            conexion.close()
+
+
+@app.route("/api/programas-academicos/asignaturas/<int:id_asignatura>/estado", methods=["PATCH"])
+@requiere_permiso("gestionar_docentes")
+def cambiar_estado_asignatura_programa(id_asignatura):
+    d = request.get_json(silent=True) or {}
+    activa = d.get("activa")
+    if not isinstance(activa, bool):
+        return jsonify({"mensaje": "El estado enviado no es válido."}), 400
+    conexion = None
+    try:
+        conexion = obtener_conexion()
+        with conexion.cursor() as cursor:
+            if not activa:
+                cursor.execute("SELECT COUNT(*) FROM public.grupos WHERE id_asignatura=%s AND activo=TRUE", (id_asignatura,))
+                if cursor.fetchone()[0] > 0:
+                    return jsonify({"mensaje": "No puedes desactivar esta asignatura porque tiene grupos activos."}), 400
+            cursor.execute("UPDATE public.asignaturas SET activa=%s WHERE id_asignatura=%s", (activa, id_asignatura))
+            if cursor.rowcount == 0:
+                return jsonify({"mensaje": "La asignatura no existe."}), 404
+        conexion.commit()
+        return jsonify({"mensaje": "Estado actualizado correctamente."}), 200
+    except Exception:
+        if conexion:
+            conexion.rollback()
+        app.logger.exception("Error al cambiar estado de asignatura")
+        return jsonify({"mensaje": "No fue posible cambiar el estado."}), 500
+    finally:
+        if conexion is not None:
+            conexion.close()
+
+
+# ======================================================
+# GESTIÓN INDEPENDIENTE DE GRUPOS
+# ======================================================
+
+@app.route("/grupos")
+@requiere_permiso("gestionar_grupos")
+def pagina_gestion_grupos():
+    return render_template("grupos.html")
+
+
+@app.route("/api/gestion-grupos", methods=["GET"])
+@requiere_permiso("gestionar_grupos")
+def listar_grupos_gestion():
+    conexion = None
+    try:
+        conexion = obtener_conexion()
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT g.id_grupo, g.periodo, g.codigo, g.codigo_asignatura,
+                       g.id_asignatura, a.nombre AS asignatura, a.semestre,
+                       g.cupo_maximo, g.activo, p.nombre AS programa
+                FROM public.grupos g
+                JOIN public.asignaturas a ON a.id_asignatura=g.id_asignatura
+                JOIN public.programas_academicos p ON p.id_programa=a.id_programa
+                ORDER BY g.periodo DESC, p.nombre, a.semestre NULLS LAST, a.nombre, g.codigo;
+            """)
+            filas = cursor.fetchall()
+        campos = ("id_grupo", "periodo", "codigo", "codigo_asignatura", "id_asignatura",
+                  "asignatura", "semestre", "cupo_maximo", "activo", "programa")
+        return jsonify({"grupos": [dict(zip(campos, fila)) for fila in filas]}), 200
+    except Exception:
+        app.logger.exception("Error al consultar grupos")
+        return jsonify({"mensaje": "No fue posible consultar los grupos."}), 500
+    finally:
+        if conexion is not None:
+            conexion.close()
+
+
+@app.route("/api/gestion-grupos/datos", methods=["GET"])
+@requiere_permiso("gestionar_grupos")
+def datos_gestion_grupos():
+    conexion = None
+    try:
+        conexion = obtener_conexion()
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT a.id_asignatura, a.nombre, a.semestre, p.nombre AS programa
+                FROM public.asignaturas a
+                JOIN public.programas_academicos p ON p.id_programa=a.id_programa
+                WHERE a.activa=TRUE AND p.activa=TRUE
+                ORDER BY p.nombre, a.semestre, a.nombre;
+            """)
+            filas = cursor.fetchall()
+        campos = ("id_asignatura", "nombre", "semestre", "programa")
+        return jsonify({"asignaturas": [dict(zip(campos, f)) for f in filas]}), 200
+    except Exception:
+        app.logger.exception("Error al consultar asignaturas para grupos")
+        return jsonify({"mensaje": "No fue posible cargar las asignaturas."}), 500
+    finally:
+        if conexion is not None:
+            conexion.close()
+
+
+def _validar_datos_grupo(d):
+    periodo = d.get("periodo", "").strip() if isinstance(d.get("periodo"), str) else ""
+    codigo = d.get("codigo", "").strip().upper() if isinstance(d.get("codigo"), str) else ""
+    codigo_asignatura = d.get("codigo_asignatura", "").strip().upper() if isinstance(d.get("codigo_asignatura"), str) else ""
+    id_asignatura, cupo = d.get("id_asignatura"), d.get("cupo_maximo")
+    if not re.fullmatch(r"\d{5}", periodo):
+        return None, "El periodo debe tener 5 dígitos, por ejemplo 22026."
+    if not re.fullmatch(r"[A-Z0-9]{1,20}", codigo):
+        return None, "El código del grupo debe contener entre 1 y 20 letras o números."
+    if codigo_asignatura and not re.fullmatch(r"[A-Z0-9]{1,20}", codigo_asignatura):
+        return None, "El código de la asignatura solo puede contener letras y números."
+    if not isinstance(id_asignatura, int) or isinstance(id_asignatura, bool):
+        return None, "Selecciona una asignatura."
+    if not isinstance(cupo, int) or isinstance(cupo, bool) or not 1 <= cupo <= 500:
+        return None, "El cupo debe estar entre 1 y 500 estudiantes."
+    return (periodo, codigo, id_asignatura, codigo_asignatura or None, cupo), None
+
+
+@app.route("/api/gestion-grupos", methods=["POST"])
+@requiere_permiso("gestionar_grupos")
+def crear_grupo_gestion():
+    valores, error = _validar_datos_grupo(request.get_json(silent=True) or {})
+    if error:
+        return jsonify({"mensaje": error}), 400
+    periodo, codigo, id_asignatura, codigo_asignatura, cupo = valores
+    conexion = None
+    try:
+        conexion = obtener_conexion()
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT 1 FROM public.asignaturas a
+                JOIN public.programas_academicos p ON p.id_programa=a.id_programa
+                WHERE a.id_asignatura=%s AND a.activa=TRUE AND p.activa=TRUE;
+            """, (id_asignatura,))
+            if cursor.fetchone() is None:
+                return jsonify({"mensaje": "La asignatura seleccionada no está disponible."}), 404
+            cursor.execute("""
+                INSERT INTO public.grupos (periodo, codigo, id_asignatura, codigo_asignatura, cupo_maximo, activo)
+                VALUES (%s, %s, %s, %s, %s, TRUE) RETURNING id_grupo;
+            """, (periodo, codigo, id_asignatura, codigo_asignatura, cupo))
+            nuevo_id = cursor.fetchone()[0]
+        conexion.commit()
+        return jsonify({"mensaje": "Grupo creado correctamente.", "id_grupo": nuevo_id}), 201
+    except Exception:
+        if conexion:
+            conexion.rollback()
+        app.logger.exception("Error al crear grupo desde Gestión de Grupos")
+        return jsonify({"mensaje": "No fue posible crear el grupo. Verifica si ya existe para esa asignatura y periodo."}), 500
+    finally:
+        if conexion is not None:
+            conexion.close()
+
+
+@app.route("/api/gestion-grupos/<int:id_grupo>", methods=["PUT"])
+@requiere_permiso("gestionar_grupos")
+def actualizar_grupo_gestion(id_grupo):
+    valores, error = _validar_datos_grupo(request.get_json(silent=True) or {})
+    if error:
+        return jsonify({"mensaje": error}), 400
+    periodo, codigo, id_asignatura, codigo_asignatura, cupo = valores
+    conexion = None
+    try:
+        conexion = obtener_conexion()
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT 1 FROM public.asignaturas a
+                JOIN public.programas_academicos p ON p.id_programa=a.id_programa
+                WHERE a.id_asignatura=%s AND a.activa=TRUE AND p.activa=TRUE;
+            """, (id_asignatura,))
+            if cursor.fetchone() is None:
+                return jsonify({"mensaje": "La asignatura seleccionada no está disponible."}), 404
+            cursor.execute("""
+                UPDATE public.grupos
+                SET periodo=%s, codigo=%s, id_asignatura=%s,
+                    codigo_asignatura=%s, cupo_maximo=%s
+                WHERE id_grupo=%s;
+            """, (periodo, codigo, id_asignatura, codigo_asignatura, cupo, id_grupo))
+            if cursor.rowcount == 0:
+                return jsonify({"mensaje": "El grupo no existe."}), 404
+        conexion.commit()
+        return jsonify({"mensaje": "Grupo actualizado correctamente."}), 200
+    except Exception:
+        if conexion:
+            conexion.rollback()
+        app.logger.exception("Error al actualizar grupo")
+        return jsonify({"mensaje": "No fue posible actualizar el grupo. Verifica que no exista un grupo duplicado para esa asignatura y periodo."}), 500
+    finally:
+        if conexion is not None:
+            conexion.close()
+
+
+@app.route("/api/gestion-grupos/<int:id_grupo>/estado", methods=["PATCH"])
+@requiere_permiso("gestionar_grupos")
+def cambiar_estado_grupo_gestion(id_grupo):
+    d = request.get_json(silent=True) or {}
+    activo = d.get("activo")
+    if not isinstance(activo, bool):
+        return jsonify({"mensaje": "El estado enviado no es válido."}), 400
+    conexion = None
+    try:
+        conexion = obtener_conexion()
+        with conexion.cursor() as cursor:
+            cursor.execute("UPDATE public.grupos SET activo=%s WHERE id_grupo=%s", (activo, id_grupo))
+            if cursor.rowcount == 0:
+                return jsonify({"mensaje": "El grupo no existe."}), 404
+        conexion.commit()
+        return jsonify({"mensaje": "Estado del grupo actualizado."}), 200
+    except Exception:
+        if conexion:
+            conexion.rollback()
+        app.logger.exception("Error al cambiar estado del grupo")
+        return jsonify({"mensaje": "No fue posible actualizar el estado del grupo."}), 500
+    finally:
+        if conexion is not None:
+            conexion.close()
+
+
 # ======================================================
 # DATOS INICIALES PARA GESTIÓN DE DOCENTES - HU5
 # ======================================================

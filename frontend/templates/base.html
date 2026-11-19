@@ -65,19 +65,22 @@
                 {% endif %}
 
                 <a href="#" class="opcion-menu proximamente">
-                    <span class="icono-menu">▤</span>
-                    <span>Gestión de Cursos</span>
-                </a>
-
-                <a href="#" class="opcion-menu proximamente">
                     <span class="icono-menu">⌂</span>
                     <span>Gestión de Salones</span>
                 </a>
 
-                <a href="#" class="opcion-menu proximamente">
+                {% if session.get('rol') in ['administrador', 'coordinador'] %}
+                <a href="{{ url_for('pagina_programas_academicos') }}"
+                   class="opcion-menu {% if request.path == '/programas-academicos' %}activa{% endif %}">
                     <span class="icono-menu">▱</span>
                     <span>Programas Académicos</span>
                 </a>
+                <a href="{{ url_for('pagina_gestion_grupos') }}"
+                   class="opcion-menu {% if request.path == '/grupos' %}activa{% endif %}">
+                    <span class="icono-menu">▦</span>
+                    <span>Gestión de Grupos</span>
+                </a>
+                {% endif %}
 
                 <a href="#" class="opcion-menu proximamente">
                     <span class="icono-menu">◷</span>
